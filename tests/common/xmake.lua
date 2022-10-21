@@ -12,10 +12,9 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-target("test_main")
-    set_kind("static")
+target("test_common_re")
+    set_kind("binary")
     set_group("test")
-    add_files("test_main.cpp")
-    add_packages("gtest", "spdlog")
-
-includes("common", "dao")
+    add_files("test_re.cpp")
+    add_includedirs("$(projectdir)/src")
+    add_packages("gtest")
