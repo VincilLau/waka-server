@@ -12,10 +12,13 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-target("test_main")
-    set_kind("static")
+target("test_dao_config_mapper")
+    set_kind("binary")
     set_group("test")
-    add_files("test_main.cpp")
-    add_packages("gtest", "spdlog")
-
-includes("dao")
+    add_files(
+        "test_config_mapper.cpp",
+        "$(projectdir)/src/dao/config_mapper.cpp",
+        "$(projectdir)/src/dao/db.cpp"
+    )
+    add_includedirs("$(projectdir)/src")
+    add_packages("fmt", "gtest", "sqlite")
