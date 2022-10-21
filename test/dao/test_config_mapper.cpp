@@ -12,40 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <fmt/core.h>
 #include <gtest/gtest.h>
-#include <sqlite3.h>
 
 #include <dao/config_mapper.hpp>
-#include <exception/db_error.hpp>
-#include <filesystem>
+#include <test.hpp>
 #include <unordered_map>
 
-using fmt::format;
 using std::string;
 using std::unordered_map;
-using std::filesystem::path;
-using std::filesystem::remove;
-using waka::exception::DBError;
+using waka::test::setupDB;
 
 namespace waka::dao {
 
-static const char* kDBPath = "./waka.db";
-
-static sqlite3* openDB() {
-  path db_path{kDBPath};
-  remove(db_path);
-  sqlite3* db = nullptr;
-  int ret = sqlite3_open(kDBPath, &db);
-  if (ret) {
-    throw DBError(format("can't open sqlite3 database '{}'", kDBPath));
-  }
-  return db;
-}
-
 TEST(TestConfig, TestCreateTable) {
-  sqlite3* db = openDB();
-  setDB(db);
+  setupDB();
 
   ConfigMapper mapper;
   mapper.createTable();
@@ -54,15 +34,14 @@ TEST(TestConfig, TestCreateTable) {
 static unordered_map<string, string> kConfigOptions = {
     {"version", "1.0.0"},           //
     {"timeout", "135"},             //
-    {"text_format", "%H小时%M分"},  //
+    {"time_format", "%H小时%M分"},  //
     {"port", "8080"},               //
-    {"logLevel", "info"},           //
+    {"log_level", "info"},          //
     {"ip", "127.0.0.1"},            //
 };
 
 TEST(TestConfig, TestUpdate) {
-  sqlite3* db = openDB();
-  setDB(db);
+  setupDB();
 
   ConfigMapper mapper;
   mapper.createTable();
@@ -81,8 +60,7 @@ TEST(TestConfig, TestUpdate) {
 }
 
 TEST(TestConfig, TestListAll) {
-  sqlite3* db = openDB();
-  setDB(db);
+  setupDB();
 
   ConfigMapper mapper;
   mapper.createTable();
@@ -95,11 +73,11 @@ TEST(TestConfig, TestListAll) {
   EXPECT_EQ(configs.size(), kConfigOptions.size());
   EXPECT_EQ(configs[0].key(), "ip");
   EXPECT_EQ(configs[0].value(), "127.0.0.1");
-  EXPECT_EQ(configs[1].key(), "logLevel");
+  EXPECT_EQ(configs[1].key(), "log_level");
   EXPECT_EQ(configs[1].value(), "info");
   EXPECT_EQ(configs[2].key(), "port");
   EXPECT_EQ(configs[2].value(), "8080");
-  EXPECT_EQ(configs[3].key(), "text_format");
+  EXPECT_EQ(configs[3].key(), "time_format");
   EXPECT_EQ(configs[3].value(), "%H小时%M分");
   EXPECT_EQ(configs[4].key(), "timeout");
   EXPECT_EQ(configs[4].value(), "135");

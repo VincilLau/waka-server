@@ -63,7 +63,7 @@ void ConfigMapper::insert(const Config& config) const {
 
 static const char* kUpdateSql =
     "UPDATE `config` "
-    "SET 'value'='{}' "
+    "SET `value`='{}' "
     "WHERE `key`='{}'";
 
 void ConfigMapper::update(const Config& config) const {
@@ -95,7 +95,6 @@ static int getCallback(void* value, int n, char** texts, char** names) {
 Config ConfigMapper::get(const string& key) const {
   string sql = format(kGetSql, key);
   string value;
-
   vector<Config> configs;
   char* errmsg = nullptr;
   int ret = sqlite3_exec(db_, sql.c_str(), getCallback, &value, &errmsg);

@@ -12,29 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_MODEL_CONFIG_HPP_
-#define WAKA_SRC_MODEL_CONFIG_HPP_
+#ifndef WAKA_TEST_TEST_HPP_
+#define WAKA_TEST_TEST_HPP_
 
+#include <fmt/core.h>
 #include <sqlite3.h>
 
-#include <string>
+#include <exception/db_error.hpp>
+#include <dao/db.hpp>
+#include <filesystem>
 
-namespace waka::model {
+namespace waka::test {
 
-// 配置表，存储waka-server的配置项
-class Config {
- public:
-  Config(std::string key, std::string value)
-      : key_(std::move(key)), value_(std::move(value)) {}
+static const char* kDBPath = "./waka.db";
 
-  [[nodiscard]] const std::string& key() const { return key_; }
-  [[nodiscard]] const std::string& value() const { return value_; }
+inline static void setupDB() {
+  std::filesystem::path db_path{kDBPath};
+  remove(db_path);
+  sqlite3* db = nullptr;
+  int ret = sqlite3_open(kDBPath, &db);
+  if (ret) {
+    throw exception::DBError(
+        fmt::format("can't open sqlite3 database '{}'", kDBPath));
+  }
+  dao::setDB(db);
+}
 
- private:
-  std::string key_;    // 配置项的键
-  std::string value_;  // 配置项的值
-};
+}  // namespace waka::test
 
-}  // namespace waka::model
-
-#endif  // WAKA_SRC_MODEL_CONFIG_HPP_
+#endif  // WAKA_TEST_TEST_HPP_

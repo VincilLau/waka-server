@@ -39,4 +39,4 @@ target("waka-server")
         "sqlite"
     )
 
-includes("tests")
+includes("test")

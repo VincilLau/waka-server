@@ -12,13 +12,31 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-target("test_dao_config_mapper")
+target("test_common_config")
     set_kind("binary")
     set_group("test")
     add_files(
-        "test_config_mapper.cpp",
-        "$(projectdir)/src/dao/config_mapper.cpp",
-        "$(projectdir)/src/dao/db.cpp"
+        "test_config.cpp",
+        "$(projectdir)/src/common/*.cpp",
+        "$(projectdir)/src/dao/*.cpp"
     )
+    add_includedirs("$(projectdir)/src", "$(projectdir)/test")
+    add_deps("test_main")
+    add_links("test_main")
+    add_packages(
+        "cpp-httplib",
+        "fmt",
+        "gtest",
+        "nlohmann_json",
+        "spdlog",
+        "sqlite"
+    )
+
+target("test_common_re")
+    set_kind("binary")
+    set_group("test")
+    add_files("test_re.cpp")
     add_includedirs("$(projectdir)/src")
-    add_packages("fmt", "gtest", "sqlite")
+    add_deps("test_main")
+    add_links("test_main")
+    add_packages("gtest")

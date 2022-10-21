@@ -12,29 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_MODEL_CONFIG_HPP_
-#define WAKA_SRC_MODEL_CONFIG_HPP_
+#ifndef WAKA_SRC_MODEL_HEARTBEAT_HPP_
+#define WAKA_SRC_MODEL_HEARTBEAT_HPP_
 
-#include <sqlite3.h>
-
+#include <cstdint>
 #include <string>
 
 namespace waka::model {
 
-// 配置表，存储waka-server的配置项
-class Config {
- public:
-  Config(std::string key, std::string value)
-      : key_(std::move(key)), value_(std::move(value)) {}
-
-  [[nodiscard]] const std::string& key() const { return key_; }
-  [[nodiscard]] const std::string& value() const { return value_; }
-
+class Heartbeat {
  private:
-  std::string key_;    // 配置项的键
-  std::string value_;  // 配置项的值
+  std::string branch_;
+  std::string category_;
+  std::string editor_;
+  std::string entity_;
+  std::string language_;
+  std::string os_;
+  std::string project_;
+  std::int64_t time_;
+  std::string type_;
 };
 
 }  // namespace waka::model
 
-#endif  // WAKA_SRC_MODEL_CONFIG_HPP_
+#endif  // WAKA_SRC_MODEL_HEARTBEAT_HPP_
