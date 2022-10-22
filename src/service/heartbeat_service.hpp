@@ -12,27 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_MODEL_HEARTBEAT_HPP_
-#define WAKA_SRC_MODEL_HEARTBEAT_HPP_
+#ifndef WAKA_SRC_SERVICE_HEARTBEAT_SERVICE_HPP_
+#define WAKA_SRC_SERVICE_HEARTBEAT_SERVICE_HPP_
 
-#include <cstdint>
-#include <string>
+#include <bo/heartbeat.hpp>
+#include <dao/heartbeat_mapper.hpp>
 
-namespace waka::model {
+namespace waka::service {
 
-struct Heartbeat {
-  std::string branch;
-  std::string category;
-  std::string editor;
-  std::string entity;
-  std::string id;
-  std::string language;
-  std::string os;
-  std::string project;
-  std::int64_t time;
-  std::string type;
+class HeartbeatService {
+ public:
+  // 返回heatbeat的ID
+  [[nodiscard]] std::string save(bo::Heartbeat heartbeat) const;
+
+ private:
+  dao::HeartbeatMapper mapper_;
 };
 
-}  // namespace waka::model
+}  // namespace waka::service
 
-#endif  // WAKA_SRC_MODEL_HEARTBEAT_HPP_
+#endif  // WAKA_SRC_SERVICE_HEARTBEAT_SERVICE_HPP_

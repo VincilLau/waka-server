@@ -20,9 +20,10 @@
 #include <common/config.hpp>
 #include <common/http.hpp>
 #include <common/log.hpp>
-#include <common/re.hpp>
+#include <common/pattern.hpp>
 #include <dto/config/get.hpp>
 #include <dto/config/put.hpp>
+#include <exception/json_error.hpp>
 #include <service/meta_service.hpp>
 #include <stdexcept>
 
@@ -37,11 +38,12 @@ using waka::common::HttpStatus;
 using waka::common::isValidIP;
 using waka::dto::config::get::Result;
 using waka::dto::config::put::Param;
+using waka::exception::JsonError;
 using waka::service::MetaService;
 
 namespace waka::controller {
 
-void getConfig(const Request& rep, Response& resp) {
+void getConfig(const Request& req, Response& resp) {
   try {
     Config config = MetaService{}.loadConfig();
 
@@ -64,29 +66,36 @@ void getConfig(const Request& rep, Response& resp) {
   }
 }
 
-void putConfig(const Request& rep, Response& resp) {
+void putConfig(const Request& req, Response& resp) {
+  Param param;
   try {
-    Param param = Param::fromJson(rep.body);
-    if (param.port < 1 || param.port > 65535) {
-      resp.status = HttpStatus::kBadRequest;
-      resp.set_content(getMsgJson("port must be in the range of 1~65535"),
-                       "application/json");
-      return;
-    }
-    if (param.timeout < 1 || param.timeout > Config::kMaxTimeout) {
-      resp.status = HttpStatus::kBadRequest;
-      resp.set_content(getMsgJson(format("port must be in the range of 1~{}",
-                                         Config::kMaxTimeout)),
-                       "application/json");
-      return;
-    }
-    if (!isValidIP(param.ip)) {
-      resp.status = HttpStatus::kBadRequest;
-      resp.set_content(getMsgJson(format("invalid ip address '{}'", param.ip)),
-                       "application/json");
-      return;
-    }
+    param = Param::fromJson(req.body);
+  } catch (const JsonError& e) {
+    resp.status = HttpStatus::kBadRequest;
+    resp.set_content(getMsgJson(e.what()), "application/json");
+  }
 
+  if (param.port < 1 || param.port > 65535) {
+    resp.status = HttpStatus::kBadRequest;
+    resp.set_content(getMsgJson("port must be in the range of 1~65535"),
+                     "application/json");
+    return;
+  }
+  if (param.timeout < 1 || param.timeout > Config::kMaxTimeout) {
+    resp.status = HttpStatus::kBadRequest;
+    resp.set_content(getMsgJson(format("port must be in the range of 1~{}",
+                                       Config::kMaxTimeout)),
+                     "application/json");
+    return;
+  }
+  if (!isValidIP(param.ip)) {
+    resp.status = HttpStatus::kBadRequest;
+    resp.set_content(getMsgJson(format("invalid ip address '{}'", param.ip)),
+                     "application/json");
+    return;
+  }
+
+  try {
     Config config;
     config.setIP(param.ip);
     config.setLogLevel(param.log_level);

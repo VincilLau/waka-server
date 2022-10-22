@@ -41,6 +41,12 @@ inline Param Param::fromJson(const std::string& json) {
     throw exception::JsonError(e.what());
   }
 
+  if (j.is_null()) {
+    throw exception::JsonError("param can't be null");
+  } else if (!j.is_object()) {
+    throw exception::JsonError("param must be a object");
+  }
+
   auto ip = j["ip"];
   auto log_level = j["log_level"];
   auto port = j["port"];

@@ -12,27 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_MODEL_HEARTBEAT_HPP_
-#define WAKA_SRC_MODEL_HEARTBEAT_HPP_
+#ifndef WAKA_SRC_CONTROLLER_HEARTBEAT_HPP_
+#define WAKA_SRC_CONTROLLER_HEARTBEAT_HPP_
 
-#include <cstdint>
-#include <string>
+#include <httplib.h>
 
-namespace waka::model {
+namespace waka::controller {
 
-struct Heartbeat {
-  std::string branch;
-  std::string category;
-  std::string editor;
-  std::string entity;
-  std::string id;
-  std::string language;
-  std::string os;
-  std::string project;
-  std::int64_t time;
-  std::string type;
-};
+void postHeartbeat(const httplib::Request& req, httplib::Response& resp);
 
-}  // namespace waka::model
+}  // namespace waka::controller
 
-#endif  // WAKA_SRC_MODEL_HEARTBEAT_HPP_
+#endif  // WAKA_SRC_CONTROLLER_HEARTBEAT_HPP_

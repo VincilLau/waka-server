@@ -12,10 +12,10 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-target("test_common_re")
+target("test_common_pattern")
     set_kind("binary")
     set_group("test")
-    add_files("test_re.cpp")
+    add_files("test_pattern.cpp")
     add_includedirs("$(projectdir)/src")
     add_deps("test_main")
     add_links("test_main")

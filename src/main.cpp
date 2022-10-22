@@ -17,9 +17,12 @@
 #include <sqlite3.h>
 
 #include <controller/config.hpp>
+#include <controller/heartbeat.hpp>
 #include <dao/db.hpp>
+#include <dao/heartbeat_mapper.hpp>
 #include <exception/db_error.hpp>
 #include <filesystem>
+#include <service/heartbeat_service.hpp>
 #include <service/meta_service.hpp>
 
 using fmt::format;
@@ -29,9 +32,12 @@ using std::filesystem::exists;
 using std::filesystem::path;
 using waka::common::Config;
 using waka::controller::getConfig;
+using waka::controller::postHeartbeat;
 using waka::controller::putConfig;
+using waka::dao::HeartbeatMapper;
 using waka::dao::setDB;
 using waka::exception::DBError;
+using waka::service::HeartbeatService;
 using waka::service::MetaService;
 
 using namespace std;
@@ -56,14 +62,16 @@ static void setupDB() {
 
   if (!db_exists) {
     SPDLOG_INFO("init meta table");
-    MetaService service;
-    service.init();
+    MetaService{}.init();
   }
+
+  HeartbeatMapper{}.loadTables();
 }
 
 static void setupRouting(Server& server) {
   server.Get("/api/config", getConfig);
   server.Put("/api/config", putConfig);
+  server.Post("/api/users/current/heartbeats.bulk", postHeartbeat);
 }
 
 static void runServer(const string& ip, uint16_t port) {

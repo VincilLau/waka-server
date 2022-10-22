@@ -14,7 +14,7 @@
 
 #include <gtest/gtest.h>
 
-#include <common/re.hpp>
+#include <common/pattern.hpp>
 
 namespace waka::common {
 

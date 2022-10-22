@@ -12,25 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_COMMON_RE_HPP_
-#define WAKA_SRC_COMMON_RE_HPP_
+#ifndef WAKA_SRC_COMMON_UUID_HPP_
+#define WAKA_SRC_COMMON_UUID_HPP_
 
-#include <regex>
 #include <string>
 
 namespace waka::common {
 
-// 判断一个字符串是否是合法的IP
-[[nodiscard]] inline static bool isValidIP(const std::string& ip) {
-  std::regex re{
-      "^"
-      "((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})"
-      "(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2}))"
-      "{3}"
-      "$"};
-  return std::regex_match(ip, re);
-}
+[[nodiscard]] std::string uuidV4();
 
 }  // namespace waka::common
 
-#endif  // WAKA_SRC_COMMON_RE_HPP_
+#endif  // WAKA_SRC_COMMON_UUID_HPP_

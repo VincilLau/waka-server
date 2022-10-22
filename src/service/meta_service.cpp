@@ -15,7 +15,7 @@
 #include "meta_service.hpp"
 
 #include <common/log.hpp>
-#include <common/re.hpp>
+#include <common/pattern.hpp>
 #include <exception/config_error.hpp>
 #include <version.hpp>
 
