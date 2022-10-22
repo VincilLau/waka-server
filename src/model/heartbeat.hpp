@@ -20,17 +20,16 @@
 
 namespace waka::model {
 
-class Heartbeat {
- private:
-  std::string branch_;
-  std::string category_;
-  std::string editor_;
-  std::string entity_;
-  std::string language_;
-  std::string os_;
-  std::string project_;
-  std::int64_t time_;
-  std::string type_;
+struct Heartbeat {
+  std::string branch;
+  std::string category;
+  std::string editor;
+  std::string entity;
+  std::string language;
+  std::string os;
+  std::string project;
+  std::int64_t time;
+  std::string type;
 };
 
 }  // namespace waka::model

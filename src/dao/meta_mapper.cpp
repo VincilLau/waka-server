@@ -51,7 +51,7 @@ static const char* kInsertSql =
     "('{}', '{}')";
 
 void MetaMapper::insert(const Meta& meta) const {
-  string sql = format(kInsertSql, meta.key(), meta.value());
+  string sql = format(kInsertSql, meta.key, meta.value);
   char* errmsg = nullptr;
   int ret = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &errmsg);
   if (ret) {
@@ -67,7 +67,7 @@ static const char* kUpdateSql =
     "WHERE `key`='{}'";
 
 void MetaMapper::update(const Meta& meta) const {
-  string sql = format(kUpdateSql, meta.value(), meta.key());
+  string sql = format(kUpdateSql, meta.value, meta.key);
   char* errmsg = nullptr;
   int ret = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &errmsg);
   if (ret) {

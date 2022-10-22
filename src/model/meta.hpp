@@ -22,17 +22,12 @@
 namespace waka::model {
 
 // 存储waka-server的元数据
-class Meta {
+struct Meta {
  public:
-  Meta(std::string key, std::string value)
-      : key_(std::move(key)), value_(std::move(value)) {}
+  Meta(std::string k, std::string v) : key(std::move(k)), value(std::move(v)) {}
 
-  [[nodiscard]] const std::string& key() const { return key_; }
-  [[nodiscard]] const std::string& value() const { return value_; }
-
- private:
-  std::string key_;
-  std::string value_;
+  std::string key;
+  std::string value;
 };
 
 }  // namespace waka::model
