@@ -30,7 +30,6 @@ struct Result {
   std::uint16_t port;
   int timeout;
   std::string time_format;
-  std::string version;
 };
 
 inline std::string Result::toJson() const {
@@ -40,7 +39,6 @@ inline std::string Result::toJson() const {
       {"port", port},                //
       {"timeout", timeout},          //
       {"time_format", time_format},  //
-      {"version", version},          //
   };
   return j.dump();
 }

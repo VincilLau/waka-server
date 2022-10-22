@@ -26,27 +26,19 @@ class Config {
  public:
   static constexpr int kMaxTimeout = 300;
 
-  [[nodiscard]] const std::string& version() const { return version_; }
   [[nodiscard]] const std::string& ip() const { return ip_; }
-  [[nodiscard]] std::uint16_t port() const { return port_; }
   [[nodiscard]] const std::string& timeFormat() const { return time_format_; }
   [[nodiscard]] int logLevel() const { return log_level_; }
   [[nodiscard]] int timeout() const { return timeout_; }
+  [[nodiscard]] std::uint16_t port() const { return port_; }
 
-  void setVersion(std::string version) { version_ = std::move(version); }
   void setIP(std::string ip) { ip_ = std::move(ip); }
-  void setPort(std::uint16_t port) { port_ = port; }
   void setTimeFormat(std::string time_format) { time_format_ = time_format; }
   void setLogLevel(int level) { log_level_ = level; }
   void setTimeout(int timeout) { timeout_ = timeout; }
-
-  // 将该Config对象保存到数据库
-  void store() const;
-  // 从数据库中加载配置
-  void load();
+  void setPort(std::uint16_t port) { port_ = port; }
 
  private:
-  std::string version_;                     // waka-server 的版本
   std::string ip_ = "127.0.0.1";            // 服务器绑定的IP地址
   std::string time_format_ = "%H小时%M分";  // 时间的可视化格式
   int log_level_ = spdlog::level::info;     // spdlog的日志等级

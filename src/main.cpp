@@ -19,11 +19,19 @@
 #include <controller/config.hpp>
 #include <dao/db.hpp>
 #include <exception/db_error.hpp>
+#include <filesystem>
+#include <service/meta_service.hpp>
 
+using fmt::format;
 using httplib::Server;
+using std::exception;
+using std::filesystem::exists;
+using std::filesystem::path;
+using waka::common::Config;
 using waka::controller::getConfig;
 using waka::dao::setDB;
 using waka::exception::DBError;
+using waka::service::MetaService;
 
 using namespace std;
 
@@ -35,24 +43,45 @@ static void setupLogger() {
 }
 
 static void setupDB() {
+  path db_path{kDBPath};
+  bool db_exists = exists(db_path);
+
   sqlite3* db = nullptr;
   int ret = sqlite3_open(kDBPath, &db);
   if (ret) {
-    throw DBError(fmt::format("can't open sqlite3 database '{}'", kDBPath));
+    throw DBError(format("can't open sqlite3 database '{}'", kDBPath));
   }
   setDB(db);
+
+  if (!db_exists) {
+    SPDLOG_INFO("init meta table");
+    MetaService service;
+    service.init();
+  }
 }
 
 static void setupRouting(Server& server) {
   server.Get("/api/config", getConfig);
 }
 
-int main() {
-  setupLogger();
-  setupDB();
-
+static void runServer(const string& ip, uint16_t port) {
   Server server;
   setupRouting(server);
-  server.listen("127.0.0.1", 8080);
+  SPDLOG_INFO("listen on '{}:{}'", ip, port);
+  server.listen(ip.c_str(), port);
+}
+
+int main() {
+  try {
+    setupLogger();
+    setupDB();
+
+    MetaService service;
+    Config config = service.loadConfig();
+    runServer(config.ip(), config.port());
+  } catch (const exception& e) {
+    SPDLOG_CRITICAL("{}", e.what());
+  }
+
   return 0;
 }

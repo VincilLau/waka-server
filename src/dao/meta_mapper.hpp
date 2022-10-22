@@ -17,27 +17,28 @@
 
 #include <sqlite3.h>
 
-#include <model/config.hpp>
+#include <cassert>
+#include <model/meta.hpp>
 #include <vector>
 
 #include "db.hpp"
 
 namespace waka::dao {
 
-class ConfigMapper {
+class MetaMapper {
  public:
-  explicit ConfigMapper() : db_(getDB()) {}
+  explicit MetaMapper() : db_(getDB()) { assert(db_); }
 
-  // 创建config表
+  // 创建meta表
   void createTable() const;
-  // 插入一条配置项
-  void insert(const model::Config& config) const;
-  // 更新配置项
-  void update(const model::Config& config) const;
-  // 查找key对应的配置项
-  model::Config get(const std::string& key) const;
-  // 列出所有配置项，按key的字典序排序
-  std::vector<model::Config> listAll() const;
+  // 插入一条数据项
+  void insert(const model::Meta& meta) const;
+  // 更新一条数据项
+  void update(const model::Meta& meta) const;
+  // 查找key对应的value
+  std::string get(const std::string& key) const;
+  // 列出所有项，按key的字典序排序
+  std::vector<model::Meta> listAll() const;
 
  private:
   sqlite3* db_;

@@ -21,6 +21,7 @@
 #include <common/http.hpp>
 #include <common/log.hpp>
 #include <dto/config/get.hpp>
+#include <service/meta_service.hpp>
 #include <stdexcept>
 
 using httplib::Request;
@@ -31,25 +32,24 @@ using waka::common::Config;
 using waka::common::HttpStatus;
 using waka::common::logLevelToString;
 using waka::dto::config::get::Result;
+using waka::service::MetaService;
 
 namespace waka::controller {
 
 void getConfig(const Request& rep, Response& resp) {
   try {
-    Config config;
-    config.load();
+    MetaService service;
+    Config config = service.loadConfig();
 
     Result result;
     result.ip = config.ip();
+    result.port = config.port();
+    result.time_format = config.timeFormat();
+    result.timeout = config.timeout();
 
     string logLevelStr = logLevelToString(config.logLevel());
     assert(!logLevelStr.empty());
     result.log_level = std::move(logLevelStr);
-
-    result.port = config.port();
-    result.time_format = config.timeFormat();
-    result.timeout = config.timeout();
-    result.version = config.version();
 
     resp.set_content(result.toJson(), "application/json");
   } catch (const exception& e) {
