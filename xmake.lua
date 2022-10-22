@@ -31,6 +31,7 @@ target("waka-server")
     add_files("src/**.cpp", "src/main.cpp")
     add_includedirs("src")
     add_defines("SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE")
+    add_defines("CPPHTTPLIB_THREAD_POOL_COUNT=1")
     add_packages(
         "cpp-httplib",
         "fmt",

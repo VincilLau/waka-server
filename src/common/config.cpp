@@ -14,9 +14,7 @@
 
 #include "config.hpp"
 
-#include <spdlog/spdlog.h>
-
-#include <cassert>
+#include <common/log.hpp>
 #include <common/re.hpp>
 #include <dao/config_mapper.hpp>
 
@@ -25,45 +23,6 @@ using std::to_string;
 using waka::dao::ConfigMapper;
 
 namespace waka::common {
-
-static string logLevelToString(int level) {
-  switch (level) {
-    case spdlog::level::trace:
-      return "trace";
-    case spdlog::level::debug:
-      return "debug";
-    case spdlog::level::info:
-      return "info";
-    case spdlog::level::warn:
-      return "warn";
-    case spdlog::level::err:
-      return "error";
-    case spdlog::level::critical:
-      return "critical";
-    case spdlog::level::off:
-      return "off";
-  }
-  assert(false);
-}
-
-static int stringToLogLevel(const string& str) {
-  if (str == "trace") {
-    return spdlog::level::trace;
-  } else if (str == "debug") {
-    return spdlog::level::debug;
-  } else if (str == "info") {
-    return spdlog::level::info;
-  } else if (str == "warn") {
-    return spdlog::level::warn;
-  } else if (str == "error") {
-    return spdlog::level::err;
-  } else if (str == "critical") {
-    return spdlog::level::critical;
-  } else if (str == "off") {
-    return spdlog::level::off;
-  }
-  return -1;
-}
 
 void Config::store() const {
   ConfigMapper mapper;
@@ -88,7 +47,7 @@ void Config::load() {
   config = mapper.get("timeout");
   timeout_ = atoi(config.value().c_str());
   config = mapper.get("port");
-  timeout_ = atoi(config.value().c_str());
+  port_ = atoi(config.value().c_str());
 }
 
 }  // namespace waka::common

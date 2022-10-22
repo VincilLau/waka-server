@@ -18,8 +18,8 @@
 #include <fmt/core.h>
 #include <sqlite3.h>
 
-#include <exception/db_error.hpp>
 #include <dao/db.hpp>
+#include <exception/db_error.hpp>
 #include <filesystem>
 
 namespace waka::test {
