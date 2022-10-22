@@ -1,3 +1,4 @@
+//
 // Copyright 2022 Vincil Lau
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,18 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_CONTROLLER_CONFIG_HPP_
-#define WAKA_SRC_CONTROLLER_CONFIG_HPP_
+#ifndef WAKA_SRC_EXCEPTION_JSON_ERROR_HPP_
+#define WAKA_SRC_EXCEPTION_JSON_ERROR_HPP_
 
-#include <httplib.h>
+#include "exception.hpp"
 
-namespace waka::controller {
+namespace waka::exception {
 
-// GET /api/config
-void getConfig(const httplib::Request& rep, httplib::Response& resp);
-// PUT /api/config
-void putConfig(const httplib::Request& rep, httplib::Response& resp);
+// JSON解析错误
+class JsonError : public Exception {
+ public:
+  explicit JsonError(std::string reason) : Exception(std::move(reason)) {}
+};
 
-}  // namespace waka::controller
+}  // namespace waka::exception
 
-#endif  // WAKA_SRC_CONTROLLER_CONFIG_HPP_
+#endif  // WAKA_SRC_EXCEPTION_JSON_ERROR_HPP_

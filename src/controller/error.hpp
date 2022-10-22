@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_CONTROLLER_CONFIG_HPP_
-#define WAKA_SRC_CONTROLLER_CONFIG_HPP_
+#ifndef WAKA_SRC_CONTROLLER_EXCEPTION_HPP_
+#define WAKA_SRC_CONTROLLER_EXCEPTION_HPP_
 
-#include <httplib.h>
+#include <fmt/core.h>
+
+#include <string>
 
 namespace waka::controller {
 
-// GET /api/config
-void getConfig(const httplib::Request& rep, httplib::Response& resp);
-// PUT /api/config
-void putConfig(const httplib::Request& rep, httplib::Response& resp);
+inline static std::string getMsgJson(const std::string& msg) {
+  return fmt::format(R"({{"message":"{}"}})", msg);
+}
 
 }  // namespace waka::controller
 
-#endif  // WAKA_SRC_CONTROLLER_CONFIG_HPP_
+#endif  // WAKA_SRC_CONTROLLER_EXCEPTION_HPP_

@@ -28,20 +28,20 @@ class Config {
 
   [[nodiscard]] const std::string& ip() const { return ip_; }
   [[nodiscard]] const std::string& timeFormat() const { return time_format_; }
-  [[nodiscard]] int logLevel() const { return log_level_; }
+  [[nodiscard]] const std::string& logLevel() const { return log_level_; }
   [[nodiscard]] int timeout() const { return timeout_; }
   [[nodiscard]] std::uint16_t port() const { return port_; }
 
   void setIP(std::string ip) { ip_ = std::move(ip); }
   void setTimeFormat(std::string time_format) { time_format_ = time_format; }
-  void setLogLevel(int level) { log_level_ = level; }
+  void setLogLevel(std::string level) { log_level_ = std::move(level); }
   void setTimeout(int timeout) { timeout_ = timeout; }
   void setPort(std::uint16_t port) { port_ = port; }
 
  private:
   std::string ip_ = "127.0.0.1";            // 服务器绑定的IP地址
   std::string time_format_ = "%H小时%M分";  // 时间的可视化格式
-  int log_level_ = spdlog::level::info;     // spdlog的日志等级
+  std::string log_level_ = "info";          // spdlog的日志等级
   int timeout_ = 135;                       // 键盘输入的超时时间
   std::uint16_t port_ = 8080;               // 服务器绑定的端口号
 };

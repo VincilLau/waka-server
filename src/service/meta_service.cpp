@@ -23,7 +23,6 @@ using std::string;
 using std::to_string;
 using waka::common::Config;
 using waka::common::isValidIP;
-using waka::common::logLevelToString;
 using waka::common::stringToLogLevel;
 using waka::exception::ConfigError;
 
@@ -58,7 +57,7 @@ Config MetaService::loadConfig() const {
   if (level == -1) {
     throw ConfigError("log_level", logLevel);
   }
-  config.setLogLevel(level);
+  config.setLogLevel(std::move(logLevel));
 
   config.setTimeFormat(mapper_.get("time_format"));
 
@@ -76,8 +75,8 @@ void MetaService::storeConfig(const Config& config) const {
   if (!isValidIP(config.ip())) {
     throw ConfigError("ip", config.ip());
   }
-  if (logLevelToString(config.logLevel()) == "") {
-    throw ConfigError("log_level", to_string(config.logLevel()));
+  if (stringToLogLevel(config.logLevel()) == -1) {
+    throw ConfigError("log_level", config.logLevel());
   }
   if (config.port() == 0) {
     throw ConfigError("port", "0");
@@ -88,7 +87,7 @@ void MetaService::storeConfig(const Config& config) const {
 
   mapper_.update({"ip", config.ip()});
   mapper_.update({"port", to_string(config.port())});
-  mapper_.update({"log_level", logLevelToString(config.logLevel())});
+  mapper_.update({"log_level", config.logLevel()});
   mapper_.update({"time_format", config.timeFormat()});
   mapper_.update({"timeout", to_string(config.timeout())});
 }

@@ -29,6 +29,7 @@ using std::filesystem::exists;
 using std::filesystem::path;
 using waka::common::Config;
 using waka::controller::getConfig;
+using waka::controller::putConfig;
 using waka::dao::setDB;
 using waka::exception::DBError;
 using waka::service::MetaService;
@@ -62,6 +63,7 @@ static void setupDB() {
 
 static void setupRouting(Server& server) {
   server.Get("/api/config", getConfig);
+  server.Put("/api/config", putConfig);
 }
 
 static void runServer(const string& ip, uint16_t port) {
