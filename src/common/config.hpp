@@ -15,9 +15,8 @@
 #ifndef WAKA_SRC_COMMON_CONFIG_HPP_
 #define WAKA_SRC_COMMON_CONFIG_HPP_
 
-#include <spdlog/spdlog.h>
-
 #include <cstdint>
+#include <memory>
 #include <string>
 
 namespace waka::common {
@@ -38,7 +37,12 @@ class Config {
   void setTimeout(int timeout) { timeout_ = timeout; }
   void setPort(std::uint16_t port) { port_ = port; }
 
+  static const Config& getConfig();
+  static void setConfig(Config config);
+
  private:
+  static std::unique_ptr<Config> config_;
+
   std::string ip_ = "127.0.0.1";            // 服务器绑定的IP地址
   std::string time_format_ = "%H小时%M分";  // 时间的可视化格式
   std::string log_level_ = "info";          // spdlog的日志等级

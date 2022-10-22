@@ -12,22 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "db.hpp"
+#include "config.hpp"
 
-#include <cassert>
+#include <assert.h>
 
-namespace waka::dao {
+using std::make_unique;
+using std::unique_ptr;
 
-static sqlite3* DB;
+namespace waka::common {
 
-sqlite3* getDB() {
-  assert(DB);
-  return DB;
+unique_ptr<Config> Config::config_;
+
+const Config& Config::getConfig() {
+  assert(config_);
+  return *config_;
 }
 
-void setDB(sqlite3* db) {
-  assert(!DB);
-  DB = db;
+void Config::setConfig(Config config) {
+  assert(!config_);
+  config_ = make_unique<Config>(std::move(config));
 }
 
-}  // namespace waka::dao
+}  // namespace waka::common

@@ -14,9 +14,6 @@
 
 #include "heartbeat.hpp"
 
-#include "spdlog/spdlog.h"
-//
-
 #include <bo/heartbeat.hpp>
 #include <common/http.hpp>
 #include <dao/heartbeat_mapper.hpp>

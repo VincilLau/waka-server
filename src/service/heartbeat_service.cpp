@@ -14,7 +14,6 @@
 
 #include "heartbeat_service.hpp"
 
-#include <cctype>
 #include <common/pattern.hpp>
 #include <common/uuid.hpp>
 #include <model/heartbeat.hpp>
@@ -24,6 +23,7 @@ using std::out_of_range;
 using std::string;
 using std::stringstream;
 using std::unordered_map;
+using waka::common::Date;
 using waka::common::parseUserAgent;
 using waka::common::uuidV4;
 using waka::model::Heartbeat;
@@ -89,6 +89,19 @@ string HeartbeatService::save(bo::Heartbeat heartbeat) const {
 
   mapper_.insert(h);
   return h.id;
+}
+
+int64_t HeartbeatService::today() const {
+  auto lst = mapper_.listByDate(Date::today());
+  if (lst.empty()) {
+    return 0;
+  }
+
+  int64_t msec = 0;
+  for (size_t i = 0; i < lst.size() - 1; i++) {
+    msec += lst[i + 1].time - lst[i].time;
+  }
+  return msec;
 }
 
 }  // namespace waka::service

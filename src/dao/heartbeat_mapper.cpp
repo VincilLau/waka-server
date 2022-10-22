@@ -20,6 +20,7 @@
 using fmt::format;
 using std::set;
 using std::string;
+using std::vector;
 using waka::common::Date;
 using waka::exception::SqlError;
 using waka::model::Heartbeat;
@@ -31,7 +32,7 @@ set<string> HeartbeatMapper::tables_;
 static const char* kLoadTablesSql =
     "SELECT `name` FROM `sqlite_master` "
     "WHERE `type`='table' AND "
-    "`name` LIKE 'heartbeat_'";
+    "`name` LIKE 'heartbeat%'";
 
 static int loadTablesCallback(void* set, int n, char** texts, char** names) {
   assert(set);
@@ -80,10 +81,9 @@ static const char* kInsertSql =
     ")";
 
 void HeartbeatMapper::insert(const Heartbeat& heartbeat) const {
-  Date date = Date::fromUnixMilli(heartbeat.time * 1000);
+  Date date = Date::fromUnixMilli(heartbeat.time);
   string table = format("heartbeat_{:04d}_{:02d}", date.year(), date.month());
-  bool table_exists = tables_.find(table) != tables_.end();
-  if (!table_exists) {
+  if (!hasTable(table)) {
     createTable(table);
     tables_.insert(table);
   }
@@ -144,6 +144,76 @@ void HeartbeatMapper::createTable(const string& name) const {
     sqlite3_free(errmsg);
     throw SqlError(std::move(reason), std::move(sql));
   }
+}
+
+static const char* kListByDateSql =
+    "SELECT "
+    "`branch`,"
+    "`category`,"
+    "`editor`,"
+    "`entity`,"
+    "`id`,"
+    "`language`,"
+    "`os`,"
+    "`project`,"
+    "`time`,"
+    "`type`"
+    " FROM `{}` "
+    "WHERE `time` >= {} "
+    "AND `time` < {} "
+    "ORDER BY `time`";
+
+static int listByDateCallback(void* v, int n, char** texts, char** names) {
+  assert(v);
+  assert(n == 10);
+  assert(string{names[0]} == "branch");
+  assert(string{names[1]} == "category");
+  assert(string{names[2]} == "editor");
+  assert(string{names[3]} == "entity");
+  assert(string{names[4]} == "id");
+  assert(string{names[5]} == "language");
+  assert(string{names[6]} == "os");
+  assert(string{names[7]} == "project");
+  assert(string{names[8]} == "time");
+  assert(string{names[9]} == "type");
+
+  auto lst = static_cast<vector<Heartbeat>*>(v);
+  Heartbeat h;
+  h.branch = texts[0];
+  h.category = texts[1];
+  h.editor = texts[2];
+  h.entity = texts[3];
+  h.id = texts[4];
+  h.language = texts[5];
+  h.os = texts[6];
+  h.project = texts[7];
+  h.time = atoll(texts[8]);
+  h.type = texts[9];
+  lst->push_back(std::move(h));
+
+  return 0;
+}
+
+vector<Heartbeat> HeartbeatMapper::listByDate(const Date& date) const {
+  string table = format("heartbeat_{:04d}_{:02d}", date.year(), date.month());
+  if (!hasTable(table)) {
+    return {};
+  }
+
+  Date tomorrow = date;
+  tomorrow++;
+  string sql =
+      format(kListByDateSql, table, date.unixMilli(), tomorrow.unixMilli());
+  vector<Heartbeat> lst;
+
+  char* errmsg = nullptr;
+  int ret = sqlite3_exec(db_, sql.c_str(), listByDateCallback, &lst, &errmsg);
+  if (ret) {
+    string reason{errmsg};
+    sqlite3_free(errmsg);
+    throw SqlError(std::move(reason), std::move(sql));
+  }
+  return lst;
 }
 
 }  // namespace waka::dao

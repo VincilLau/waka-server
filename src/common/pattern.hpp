@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_COMMON_RE_HPP_
-#define WAKA_SRC_COMMON_RE_HPP_
+#ifndef WAKA_SRC_COMMON_PATTERN_HPP_
+#define WAKA_SRC_COMMON_PATTERN_HPP_
+
+#include <fmt/core.h>
 
 #include <cassert>
 #include <regex>
 #include <string>
+
+#include "config.hpp"
 
 namespace waka::common {
 
@@ -44,6 +48,20 @@ namespace waka::common {
   return {"unknown", "unknown"};
 }
 
+[[nodiscard]] inline static std::string formatTime(int hour, int min) {
+  assert(hour >= 0);
+  assert(min >= 0);
+
+  auto config = Config::getConfig();
+  std::string text = std::regex_replace(
+      config.timeFormat(), std::regex{"(%HH)"}, fmt::format("{:02d}", hour));
+  text = std::regex_replace(text, std::regex{"(%H)"}, std::to_string(hour));
+  text =
+      std::regex_replace(text, std::regex{"(%MM)"}, fmt::format("{:02d}", min));
+  text = std::regex_replace(text, std::regex{"(%M)"}, std::to_string(min));
+  return text;
+}
+
 }  // namespace waka::common
 
-#endif  // WAKA_SRC_COMMON_RE_HPP_
+#endif  // WAKA_SRC_COMMON_PATTERN_HPP_

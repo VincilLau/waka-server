@@ -16,8 +16,10 @@
 #include <spdlog/spdlog.h>
 #include <sqlite3.h>
 
+#include <common/config.hpp>
 #include <controller/config.hpp>
 #include <controller/heartbeat.hpp>
+#include <controller/status_bar.hpp>
 #include <dao/db.hpp>
 #include <dao/heartbeat_mapper.hpp>
 #include <exception/db_error.hpp>
@@ -32,12 +34,12 @@ using std::filesystem::exists;
 using std::filesystem::path;
 using waka::common::Config;
 using waka::controller::getConfig;
+using waka::controller::getStatusBar;
 using waka::controller::postHeartbeat;
 using waka::controller::putConfig;
 using waka::dao::HeartbeatMapper;
 using waka::dao::setDB;
 using waka::exception::DBError;
-using waka::service::HeartbeatService;
 using waka::service::MetaService;
 
 using namespace std;
@@ -68,10 +70,16 @@ static void setupDB() {
   HeartbeatMapper{}.loadTables();
 }
 
+static void setupConfig() {
+  Config config = MetaService{}.loadConfig();
+  Config::setConfig(std::move(config));
+}
+
 static void setupRouting(Server& server) {
   server.Get("/api/config", getConfig);
   server.Put("/api/config", putConfig);
   server.Post("/api/users/current/heartbeats.bulk", postHeartbeat);
+  server.Get("/api/users/current/statusbar/today", getStatusBar);
 }
 
 static void runServer(const string& ip, uint16_t port) {
@@ -85,6 +93,7 @@ int main() {
   try {
     setupLogger();
     setupDB();
+    setupConfig();
 
     MetaService service;
     Config config = service.loadConfig();

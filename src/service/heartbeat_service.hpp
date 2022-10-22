@@ -25,6 +25,9 @@ class HeartbeatService {
   // 返回heatbeat的ID
   [[nodiscard]] std::string save(bo::Heartbeat heartbeat) const;
 
+  // 获取今日时间的毫秒数
+  std::int64_t today() const;
+
  private:
   dao::HeartbeatMapper mapper_;
 };

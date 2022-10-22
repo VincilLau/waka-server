@@ -12,22 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "db.hpp"
+#ifndef WAKA_SRC_CONTROLLER_STATUS_BAR_HPP_
+#define WAKA_SRC_CONTROLLER_STATUS_BAR_HPP_
 
-#include <cassert>
+#include <httplib.h>
 
-namespace waka::dao {
+namespace waka::controller {
 
-static sqlite3* DB;
+void getStatusBar(const httplib::Request& req, httplib::Response& resp);
 
-sqlite3* getDB() {
-  assert(DB);
-  return DB;
-}
+}  // namespace waka::controller
 
-void setDB(sqlite3* db) {
-  assert(!DB);
-  DB = db;
-}
-
-}  // namespace waka::dao
+#endif  // WAKA_SRC_CONTROLLER_STATUS_BAR_HPP_

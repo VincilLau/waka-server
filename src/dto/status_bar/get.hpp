@@ -12,22 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "db.hpp"
+#ifndef WAKA_SRC_DTO_STATUS_BAR_GET_HPP_
+#define WAKA_SRC_DTO_STATUS_BAR_GET_HPP_
 
-#include <cassert>
+#include <nlohmann/json.hpp>
+#include <string>
 
-namespace waka::dao {
+namespace waka::dto::statusbar::get {
 
-static sqlite3* DB;
+struct Result {
+  Result(std::string time_text) : text(std::move(time_text)) {}
+  std::string toJson() const;
 
-sqlite3* getDB() {
-  assert(DB);
-  return DB;
+  std::string text;
+};
+
+inline std::string Result::toJson() const {
+  nlohmann::json j = {{"data", {{"grand_total", {{"text", text}}}}}};
+  return j.dump();
 }
 
-void setDB(sqlite3* db) {
-  assert(!DB);
-  DB = db;
-}
+}  // namespace waka::dto::statusbar::get
 
-}  // namespace waka::dao
+#endif  // WAKA_SRC_DTO_STATUS_BAR_GET_HPP_

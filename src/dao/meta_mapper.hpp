@@ -17,7 +17,6 @@
 
 #include <sqlite3.h>
 
-#include <cassert>
 #include <model/meta.hpp>
 #include <vector>
 
@@ -27,7 +26,7 @@ namespace waka::dao {
 
 class MetaMapper {
  public:
-  MetaMapper() : db_(getDB()) { assert(db_); }
+  MetaMapper() : db_(getDB()) {}
 
   // 创建meta表
   void createTable() const;
