@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_DAO_CONFIG_MAPPER_HPP_
-#define WAKA_SRC_DAO_CONFIG_MAPPER_HPP_
+#ifndef WAKA_SRC_DAO_META_MAPPER_HPP_
+#define WAKA_SRC_DAO_META_MAPPER_HPP_
 
 #include <sqlite3.h>
 
@@ -46,4 +46,4 @@ class MetaMapper {
 
 }  // namespace waka::dao
 
-#endif  // WAKA_SRC_DAO_CONFIG_MAPPER_HPP_
+#endif  // WAKA_SRC_DAO_META_MAPPER_HPP_
