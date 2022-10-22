@@ -27,7 +27,7 @@ namespace waka::dao {
 
 class MetaMapper {
  public:
-  explicit MetaMapper() : db_(getDB()) { assert(db_); }
+  MetaMapper() : db_(getDB()) { assert(db_); }
 
   // 创建meta表
   void createTable() const;
