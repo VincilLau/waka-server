@@ -40,5 +40,3 @@ target("waka-server")
         "spdlog",
         "sqlite"
     )
-
-includes("test")
