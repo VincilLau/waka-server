@@ -18,6 +18,8 @@
 #include <cstdint>
 #include <cstring>
 #include <ctime>
+#include <exception/date_error.hpp>
+#include <regex>
 #include <string>
 
 #ifndef WAKA_SRC_COMMON_DATE_HPP_
@@ -43,6 +45,46 @@ class Date {
     day_++;
     validate();
     return *this;
+  }
+
+  [[nodiscard]] bool operator==(const Date& other) const {
+    return year_ == other.year_ && month_ == other.month_ && day_ == other.day_;
+  }
+
+  [[nodiscard]] bool operator<(const Date& other) const {
+    if (year_ < other.year_) {
+      return true;
+    } else if (month_ < other.month_) {
+      return true;
+    }
+    return day_ < other.day_;
+  }
+
+  [[nodiscard]] bool operator>(const Date& other) const {
+    if (year_ > other.year_) {
+      return true;
+    } else if (month_ > other.month_) {
+      return true;
+    }
+    return day_ > other.day_;
+  }
+
+  [[nodiscard]] bool operator<=(const Date& other) const {
+    if (year_ < other.year_) {
+      return true;
+    } else if (month_ < other.month_) {
+      return true;
+    }
+    return day_ <= other.day_;
+  }
+
+  [[nodiscard]] bool operator>=(const Date& other) const {
+    if (year_ > other.year_) {
+      return true;
+    } else if (month_ > other.month_) {
+      return true;
+    }
+    return day_ >= other.day_;
   }
 
   [[nodiscard]] bool isLeapYear() const {
@@ -81,6 +123,22 @@ class Date {
     time_t t = time(nullptr);
     struct tm* tm = localtime(&t);
     return {tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday};
+  }
+
+  static Date parse(const std::string& str) {
+    std::regex pattern{"^(\\d{4})-(\\d{2})-(\\d{2})$"};
+    std::smatch matches;
+    if (!std::regex_match(str, matches, pattern)) {
+      throw exception::DateError(str);
+    }
+    assert(matches.size() == 4);
+    int year = atoi(matches[1].str().c_str());
+    int month = atoi(matches[2].str().c_str());
+    int day = atoi(matches[3].str().c_str());
+    if (year <= 0 || month <= 0 || day <= 0) {
+      throw exception::DateError(str);
+    }
+    return {year, month, day};
   }
 
  private:

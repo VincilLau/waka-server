@@ -16,6 +16,8 @@
 #define WAKA_SRC_SERVICE_HEARTBEAT_SERVICE_HPP_
 
 #include <bo/heartbeat.hpp>
+#include <bo/summaries.hpp>
+#include <common/date.hpp>
 #include <dao/heartbeat_mapper.hpp>
 
 namespace waka::service {
@@ -26,7 +28,11 @@ class HeartbeatService {
   [[nodiscard]] std::string save(bo::Heartbeat heartbeat) const;
 
   // 获取今日时间的毫秒数
-  std::int64_t today() const;
+  [[nodiscard]] std::int64_t today() const;
+
+  // 获取指定时间区间(闭区间)内的汇总数据
+  [[nodiscard]] bo::Summaries summarize(const common::Date& start,
+                                        const common::Date& end);
 
  private:
   dao::HeartbeatMapper mapper_;

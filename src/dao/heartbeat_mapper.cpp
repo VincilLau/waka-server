@@ -195,6 +195,11 @@ static int listByDateCallback(void* v, int n, char** texts, char** names) {
 }
 
 vector<Heartbeat> HeartbeatMapper::listByDate(const Date& date) const {
+  Date today = Date::today();
+  if (date > today) {
+    return {};
+  }
+
   string table = format("heartbeat_{:04d}_{:02d}", date.year(), date.month());
   if (!hasTable(table)) {
     return {};

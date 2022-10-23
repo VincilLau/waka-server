@@ -20,6 +20,7 @@
 #include <controller/config.hpp>
 #include <controller/heartbeat.hpp>
 #include <controller/status_bar.hpp>
+#include <controller/summaries.hpp>
 #include <dao/db.hpp>
 #include <dao/heartbeat_mapper.hpp>
 #include <exception/db_error.hpp>
@@ -35,6 +36,7 @@ using std::filesystem::path;
 using waka::common::Config;
 using waka::controller::getConfig;
 using waka::controller::getStatusBar;
+using waka::controller::getSummaries;
 using waka::controller::postHeartbeat;
 using waka::controller::putConfig;
 using waka::dao::HeartbeatMapper;
@@ -80,6 +82,7 @@ static void setupRouting(Server& server) {
   server.Put("/api/config", putConfig);
   server.Post("/api/users/current/heartbeats.bulk", postHeartbeat);
   server.Get("/api/users/current/statusbar/today", getStatusBar);
+  server.Get("/api/summaries", getSummaries);
 }
 
 static void runServer(const string& ip, uint16_t port) {

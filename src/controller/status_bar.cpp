@@ -33,9 +33,7 @@ namespace waka::controller {
 void getStatusBar(const Request& req, Response& resp) {
   try {
     int64_t msec = HeartbeatService{}.today();
-    int64_t hour = msec / 1000 / 3600;
-    int64_t min = msec / 1000 / 60 % 60;
-    Result result(formatTime(hour, min));
+    Result result(formatTime(msec));
     resp.status = HttpStatus::kOK;
     resp.set_content(result.toJson(), "application/json");
   } catch (const std::exception& e) {

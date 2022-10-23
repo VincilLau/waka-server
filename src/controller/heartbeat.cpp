@@ -71,6 +71,9 @@ void postHeartbeat(const Request& req, Response& resp) {
     if (h.type) {
       heartbeat.type = std::move(*h.type);
     }
+    if (h.user_agent) {
+      heartbeat.user_agent = std::move(*h.user_agent);
+    }
 
     try {
       result.responses[i].first = service.save(heartbeat);

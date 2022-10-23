@@ -39,26 +39,28 @@ namespace waka::common {
 // 返回值为{os, editor}
 [[nodiscard]] inline static std::pair<std::string, std::string> parseUserAgent(
     const std::string& ua) {
-  std::regex pattern("^wakatime/.+ \\((.+?)-.+-.+\\) .+ (.+)/.+$");
+  std::regex pattern(R"(^wakatime/.+ \((.+?)-.+-.+\) .+ (.+)/.+$)");
   std::smatch matches;
   if (std::regex_match(ua, matches, pattern)) {
-    assert(matches.size() == 2);
-    return {matches[0], matches[1]};
+    assert(matches.size() == 3);
+    return {matches[1], matches[2]};
   }
   return {"unknown", "unknown"};
 }
 
-[[nodiscard]] inline static std::string formatTime(int hour, int min) {
-  assert(hour >= 0);
-  assert(min >= 0);
+[[nodiscard]] inline static std::string formatTime(std::int64_t msec) {
+  assert(msec >= 0);
+
+  int hours = msec / 1000 / 3600;
+  int minuates = msec / 1000 / 60 % 60;
 
   auto config = Config::getConfig();
   std::string text = std::regex_replace(
-      config.timeFormat(), std::regex{"(%HH)"}, fmt::format("{:02d}", hour));
-  text = std::regex_replace(text, std::regex{"(%H)"}, std::to_string(hour));
-  text =
-      std::regex_replace(text, std::regex{"(%MM)"}, fmt::format("{:02d}", min));
-  text = std::regex_replace(text, std::regex{"(%M)"}, std::to_string(min));
+      config.timeFormat(), std::regex{"(%HH)"}, fmt::format("{:02d}", hours));
+  text = std::regex_replace(text, std::regex{"(%H)"}, std::to_string(hours));
+  text = std::regex_replace(text, std::regex{"(%MM)"},
+                            fmt::format("{:02d}", minuates));
+  text = std::regex_replace(text, std::regex{"(%M)"}, std::to_string(minuates));
   return text;
 }
 

@@ -23,6 +23,7 @@ using std::out_of_range;
 using std::string;
 using std::stringstream;
 using std::unordered_map;
+using waka::bo::Summaries;
 using waka::common::Date;
 using waka::common::parseUserAgent;
 using waka::common::uuidV4;
@@ -102,6 +103,73 @@ int64_t HeartbeatService::today() const {
     msec += lst[i + 1].time - lst[i].time;
   }
   return msec;
+}
+
+Summaries HeartbeatService::summarize(const Date& start, const Date& end) {
+  assert(start <= end);
+
+  Summaries summaries;
+  for (Date date = start; date <= end; date++) {
+    auto lst = mapper_.listByDate(date);
+    if (lst.empty()) {
+      continue;
+    }
+
+    for (size_t i = 0; i < lst.size() - 1; i++) {
+      auto& h1 = lst[i];
+      auto& h2 = lst[i + 1];
+      int64_t duration = h2.time - h1.time;
+
+      {
+        auto it = summaries.categories.find(h1.category);
+        if (it != summaries.categories.end()) {
+          it->second += duration;
+        } else {
+          summaries.categories.insert({std::move(h1.category), duration});
+        }
+      }
+
+      {
+        auto it = summaries.editors.find(h1.editor);
+        if (it != summaries.editors.end()) {
+          it->second += duration;
+        } else {
+          summaries.editors.insert({std::move(h1.editor), duration});
+        }
+      }
+
+      {
+        auto it = summaries.languages.find(h1.language);
+        if (it != summaries.languages.end()) {
+          it->second += duration;
+        } else {
+          summaries.languages.insert({std::move(h1.language), duration});
+        }
+      }
+
+      {
+        auto it = summaries.oss.find(h1.os);
+        if (it != summaries.oss.end()) {
+          it->second += duration;
+        } else {
+          summaries.oss.insert({std::move(h1.os), duration});
+        }
+      }
+
+      {
+        auto it = summaries.projects.find(h1.project);
+        if (it != summaries.projects.end()) {
+          it->second += duration;
+        } else {
+          summaries.projects.insert({std::move(h1.project), duration});
+        }
+      }
+
+      summaries.total_msec += duration;
+    }
+  }
+
+  return summaries;
 }
 
 }  // namespace waka::service
