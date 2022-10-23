@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <service/heartbeat_service.hpp>
-//
+#include "status_bar.hpp"
+
 #include <common/http.hpp>
 #include <common/pattern.hpp>
 #include <dto/status_bar/get.hpp>
+#include <service/heartbeat_service.hpp>
 
 #include "error.hpp"
-#include "status_bar.hpp"
 
 using httplib::Request;
 using httplib::Response;
