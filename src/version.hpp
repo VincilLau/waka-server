@@ -19,6 +19,6 @@ namespace waka {
 
 static const char* kVersion = "0.0.0";
 
-}
+}  // namespace waka
 
 #endif  // WAKA_SRC_VERSION_HPP_

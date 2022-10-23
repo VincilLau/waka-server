@@ -83,6 +83,6 @@ enum HttpStatus {
   kNetworkAuthenticationRequired = 511,
 };
 
-}
+}  // namespace waka::common
 
 #endif  // WAKA_SRC_COMMON_HTTP_HPP_
