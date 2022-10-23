@@ -19,8 +19,6 @@
 #include <dto/status_bar/get.hpp>
 #include <service/heartbeat_service.hpp>
 
-#include "error.hpp"
-
 using httplib::Request;
 using httplib::Response;
 using waka::common::formatTime;
@@ -31,15 +29,10 @@ using waka::service::HeartbeatService;
 namespace waka::controller {
 
 void getStatusBar(const Request& req, Response& resp) {
-  try {
-    int64_t msec = HeartbeatService{}.today();
-    Result result(formatTime(msec));
-    resp.status = HttpStatus::kOK;
-    resp.set_content(result.toJson(), "application/json");
-  } catch (const std::exception& e) {
-    resp.status = HttpStatus::kInternalServerError;
-    resp.set_content(getMsgJson(e.what()), "application/json");
-  }
+  int64_t msec = HeartbeatService{}.today();
+  Result result(formatTime(msec));
+  resp.status = HttpStatus::kOK;
+  resp.set_content(result.toJson(), "application/json");
 }
 
 }  // namespace waka::controller

@@ -21,18 +21,43 @@
 #include <exception/json_error.hpp>
 #include <service/heartbeat_service.hpp>
 
-#include "error.hpp"
+#include "msg.hpp"
 
 using httplib::Request;
 using httplib::Response;
 using waka::bo::Heartbeat;
 using waka::common::HttpStatus;
-using waka::dto::heartbeat::Param;
-using waka::dto::heartbeat::Result;
+using waka::dto::heartbeat::post::Param;
+using waka::dto::heartbeat::post::Result;
 using waka::exception::JsonError;
 using waka::service::HeartbeatService;
 
 namespace waka::controller {
+
+static bo::Heartbeat dtoToBO(const dto::heartbeat::post::Heartbeat& dto) {
+  Heartbeat bo;
+  bo.entity = std::move(*dto.entity);
+  bo.time = static_cast<int64_t>(*dto.time * 1000);
+  if (dto.branch) {
+    bo.branch = std::move(*dto.branch);
+  }
+  if (dto.category) {
+    bo.category = std::move(*dto.category);
+  }
+  if (dto.language) {
+    bo.language = std::move(*dto.language);
+  }
+  if (dto.project) {
+    bo.project = std::move(*dto.project);
+  }
+  if (dto.type) {
+    bo.type = std::move(*dto.type);
+  }
+  if (dto.user_agent) {
+    bo.user_agent = std::move(*dto.user_agent);
+  }
+  return bo;
+}
 
 void postHeartbeat(const Request& req, Response& resp) {
   Param param;
@@ -40,58 +65,32 @@ void postHeartbeat(const Request& req, Response& resp) {
     param = Param::fromJson(req.body);
   } catch (const JsonError& e) {
     resp.status = HttpStatus::kBadRequest;
-    resp.set_content(getMsgJson(e.what()), "application/json");
+    resp.set_content(jsonMsg(e.what()), "application/json");
     return;
   }
 
   Result result(param.heartbeats.size());
   HeartbeatService service;
   for (size_t i = 0; i < param.heartbeats.size(); i++) {
-    auto& h = param.heartbeats[i];
-    if (!h.entity || !h.time) {
+    auto& dto = param.heartbeats[i];
+    if (!dto.entity || !dto.time) {
       result.responses[i].second = HttpStatus::kBadRequest;
       continue;
     }
 
-    Heartbeat heartbeat;
-    heartbeat.entity = std::move(*h.entity);
-    heartbeat.time = static_cast<int64_t>(*h.time * 1000);
-    if (h.branch) {
-      heartbeat.branch = std::move(*h.branch);
-    }
-    if (h.category) {
-      heartbeat.category = std::move(*h.category);
-    }
-    if (h.language) {
-      heartbeat.language = std::move(*h.language);
-    }
-    if (h.project) {
-      heartbeat.project = std::move(*h.project);
-    }
-    if (h.type) {
-      heartbeat.type = std::move(*h.type);
-    }
-    if (h.user_agent) {
-      heartbeat.user_agent = std::move(*h.user_agent);
-    }
-
+    Heartbeat bo = dtoToBO(dto);
     try {
-      result.responses[i].first = service.save(heartbeat);
+      result.responses[i].first = service.save(bo);
     } catch (const std::exception& e) {
       resp.status = HttpStatus::kInternalServerError;
-      resp.set_content(getMsgJson(e.what()), "application/json");
+      resp.set_content(jsonMsg(e.what()), "application/json");
       return;
     }
     result.responses[i].second = HttpStatus::kCreated;
   }
 
-  try {
-    resp.status = HttpStatus::kAccepted;
-    resp.set_content(result.toJson(), "application/json");
-  } catch (const std::exception& e) {
-    resp.status = HttpStatus::kInternalServerError;
-    resp.set_content(getMsgJson(e.what()), "application/json");
-  }
+  resp.status = HttpStatus::kAccepted;
+  resp.set_content(result.toJson(), "application/json");
 }
 
 }  // namespace waka::controller

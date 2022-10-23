@@ -28,7 +28,7 @@ add_requires(
 
 target("waka-server")
     set_kind("binary")
-    add_files("src/**.cpp", "src/main.cpp")
+    add_files("src/**.cpp")
     add_includedirs("src")
     add_defines("SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE")
     add_defines("SPDLOG_FMT_EXTERNAL=ON")

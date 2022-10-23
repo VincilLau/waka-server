@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_CONTROLLER_EXCEPTION_HPP_
-#define WAKA_SRC_CONTROLLER_EXCEPTION_HPP_
+#ifndef WAKA_SRC_CONTROLLER_MSG_HPP_
+#define WAKA_SRC_CONTROLLER_MSG_HPP_
 
-#include <fmt/core.h>
-
-#include <string>
+#include <nlohmann/json.hpp>
 
 namespace waka::controller {
 
-inline static std::string getMsgJson(const std::string& msg) {
-  return fmt::format(R"({{"message":"{}"}})", msg);
+[[nodiscard]] inline static std::string jsonMsg(std::string error) {
+  return nlohmann::json{{"message", std::move(error)}}.dump();
 }
 
 }  // namespace waka::controller
 
-#endif  // WAKA_SRC_CONTROLLER_EXCEPTION_HPP_
+#endif  // WAKA_SRC_CONTROLLER_MSG_HPP_

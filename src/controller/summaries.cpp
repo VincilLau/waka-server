@@ -20,7 +20,7 @@
 #include <dto/summary/get.hpp>
 #include <service/heartbeat_service.hpp>
 
-#include "error.hpp"
+#include "msg.hpp"
 
 using fmt::format;
 using httplib::Request;
@@ -46,7 +46,7 @@ void getSummaries(const Request& req, Response& resp) {
     end = Date::parse(end_param);
   } catch (const DateError& e) {
     resp.status = HttpStatus::kBadRequest;
-    resp.set_content(getMsgJson(e.what()), "application/json");
+    resp.set_content(jsonMsg(e.what()), "application/json");
     return;
   }
   if (start > end) {
@@ -55,60 +55,55 @@ void getSummaries(const Request& req, Response& resp) {
     return;
   }
 
-  try {
-    auto summaries = HeartbeatService{}.summarize(start, end);
+  auto summaries = HeartbeatService{}.summarize(start, end);
 
-    Result result;
-    result.total.name = format("'{}'~'{}'", start.toString(), end.toString());
-    result.total.time_text = formatTime(summaries.total_msec);
-    result.total.total_msec = summaries.total_msec;
+  Result result;
+  result.total.name = format("'{}'~'{}'", start.toString(), end.toString());
+  result.total.time_text = formatTime(summaries.total_msec);
+  result.total.total_msec = summaries.total_msec;
 
-    for (auto& i : summaries.categories) {
-      Summary s;
-      s.name = std::move(i.first);
-      s.time_text = formatTime(i.second);
-      s.total_msec = i.second;
-      result.categories.array.push_back(std::move(s));
-    }
-
-    for (auto& i : summaries.editors) {
-      Summary s;
-      s.name = std::move(i.first);
-      s.time_text = formatTime(i.second);
-      s.total_msec = i.second;
-      result.editors.array.push_back(std::move(s));
-    }
-
-    for (auto& i : summaries.languages) {
-      Summary s;
-      s.name = std::move(i.first);
-      s.time_text = formatTime(i.second);
-      s.total_msec = i.second;
-      result.languages.array.push_back(std::move(s));
-    }
-
-    for (auto& i : summaries.oss) {
-      Summary s;
-      s.name = std::move(i.first);
-      s.time_text = formatTime(i.second);
-      s.total_msec = i.second;
-      result.oss.array.push_back(std::move(s));
-    }
-
-    for (auto& i : summaries.projects) {
-      Summary s;
-      s.name = std::move(i.first);
-      s.time_text = formatTime(i.second);
-      s.total_msec = i.second;
-      result.projects.array.push_back(std::move(s));
-    }
-
-    resp.status = HttpStatus::kOK;
-    resp.set_content(result.toJson(), "application/json");
-  } catch (const std::exception& e) {
-    resp.status = HttpStatus::kInternalServerError;
-    resp.set_content(getMsgJson(e.what()), "application/json");
+  for (auto& i : summaries.categories) {
+    Summary s;
+    s.name = std::move(i.first);
+    s.time_text = formatTime(i.second);
+    s.total_msec = i.second;
+    result.categories.array.push_back(std::move(s));
   }
+
+  for (auto& i : summaries.editors) {
+    Summary s;
+    s.name = std::move(i.first);
+    s.time_text = formatTime(i.second);
+    s.total_msec = i.second;
+    result.editors.array.push_back(std::move(s));
+  }
+
+  for (auto& i : summaries.languages) {
+    Summary s;
+    s.name = std::move(i.first);
+    s.time_text = formatTime(i.second);
+    s.total_msec = i.second;
+    result.languages.array.push_back(std::move(s));
+  }
+
+  for (auto& i : summaries.oss) {
+    Summary s;
+    s.name = std::move(i.first);
+    s.time_text = formatTime(i.second);
+    s.total_msec = i.second;
+    result.oss.array.push_back(std::move(s));
+  }
+
+  for (auto& i : summaries.projects) {
+    Summary s;
+    s.name = std::move(i.first);
+    s.time_text = formatTime(i.second);
+    s.total_msec = i.second;
+    result.projects.array.push_back(std::move(s));
+  }
+
+  resp.status = HttpStatus::kOK;
+  resp.set_content(result.toJson(), "application/json");
 }
 
 }  // namespace waka::controller

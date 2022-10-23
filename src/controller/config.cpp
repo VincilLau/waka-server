@@ -25,9 +25,8 @@
 #include <dto/config/put.hpp>
 #include <exception/json_error.hpp>
 #include <service/meta_service.hpp>
-#include <stdexcept>
 
-#include "error.hpp"
+#include "msg.hpp"
 
 using fmt::format;
 using httplib::Request;
@@ -44,74 +43,62 @@ using waka::service::MetaService;
 namespace waka::controller {
 
 void getConfig(const Request& req, Response& resp) {
+  Config config = MetaService{}.loadConfig();
+
+  Result result;
+  result.ip = config.ip();
+  result.port = config.port();
+  result.time_format = config.timeFormat();
+  result.timeout = config.timeout();
+
+  string logLevelStr = config.logLevel();
+  assert(!logLevelStr.empty());
+  result.log_level = std::move(logLevelStr);
+
+  resp.status = HttpStatus::kOK;
+  resp.set_content(result.toJson(), "application/json");
+}
+
+static string parsePutConfigBody(const string& body, Param& param) {
   try {
-    Config config = MetaService{}.loadConfig();
-
-    Result result;
-    result.ip = config.ip();
-    result.port = config.port();
-    result.time_format = config.timeFormat();
-    result.timeout = config.timeout();
-
-    string logLevelStr = config.logLevel();
-    assert(!logLevelStr.empty());
-    result.log_level = std::move(logLevelStr);
-
-    resp.status = HttpStatus::kOK;
-    resp.set_content(result.toJson(), "application/json");
-  } catch (const std::exception& e) {
-    SPDLOG_ERROR("{}", e.what());
-    resp.status = HttpStatus::kInternalServerError;
-    resp.set_content(getMsgJson(e.what()), "application/json");
+    param = Param::fromJson(body);
+  } catch (const JsonError& e) {
+    return jsonMsg(e.what());
   }
+
+  if (param.port < 1 || param.port > 65535) {
+    return jsonMsg("port must be in the range of 1~65535");
+  }
+  if (param.timeout < 1 || param.timeout > Config::kMaxTimeout) {
+    string error =
+        format("timeout must be in the range of 1~{}", Config::kMaxTimeout);
+    return jsonMsg(std::move(error));
+  }
+  if (!isValidIP(param.ip)) {
+    string error = format("invalid ip address '{}'", param.ip);
+    return jsonMsg(std::move(error));
+  }
+  return "";
 }
 
 void putConfig(const Request& req, Response& resp) {
   Param param;
-  try {
-    param = Param::fromJson(req.body);
-  } catch (const JsonError& e) {
+  string msg = parsePutConfigBody(req.body, param);
+  if (!msg.empty()) {
     resp.status = HttpStatus::kBadRequest;
-    resp.set_content(getMsgJson(e.what()), "application/json");
+    resp.set_content(msg, "application/json");
   }
 
-  if (param.port < 1 || param.port > 65535) {
-    resp.status = HttpStatus::kBadRequest;
-    resp.set_content(getMsgJson("port must be in the range of 1~65535"),
-                     "application/json");
-    return;
-  }
-  if (param.timeout < 1 || param.timeout > Config::kMaxTimeout) {
-    resp.status = HttpStatus::kBadRequest;
-    resp.set_content(getMsgJson(format("port must be in the range of 1~{}",
-                                       Config::kMaxTimeout)),
-                     "application/json");
-    return;
-  }
-  if (!isValidIP(param.ip)) {
-    resp.status = HttpStatus::kBadRequest;
-    resp.set_content(getMsgJson(format("invalid ip address '{}'", param.ip)),
-                     "application/json");
-    return;
-  }
+  Config config;
+  config.setIP(param.ip);
+  config.setLogLevel(param.log_level);
+  config.setTimeFormat(param.time_format);
+  config.setPort(param.port);
+  config.setTimeout(param.timeout);
+  MetaService{}.storeConfig(config);
 
-  try {
-    Config config;
-    config.setIP(param.ip);
-    config.setLogLevel(param.log_level);
-    config.setTimeFormat(param.time_format);
-    config.setPort(param.port);
-    config.setTimeout(param.timeout);
-    MetaService{}.storeConfig(config);
-
-    resp.status = HttpStatus::kOK;
-    resp.set_content(getMsgJson("ok"), "application/json");
-    return;
-  } catch (const std::exception& e) {
-    SPDLOG_ERROR("{}", e.what());
-    resp.status = HttpStatus::kInternalServerError;
-    resp.set_content(getMsgJson(e.what()), "application/json");
-  }
+  resp.status = HttpStatus::kOK;
+  resp.set_content(jsonMsg("ok"), "application/json");
 }
 
 }  // namespace waka::controller

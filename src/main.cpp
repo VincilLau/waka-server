@@ -21,6 +21,7 @@
 #include <controller/heartbeat.hpp>
 #include <controller/status_bar.hpp>
 #include <controller/summaries.hpp>
+#include <controller/wrapper.hpp>
 #include <dao/db.hpp>
 #include <dao/heartbeat_mapper.hpp>
 #include <exception/db_error.hpp>
@@ -31,6 +32,7 @@
 using fmt::format;
 using httplib::Server;
 using std::exception;
+using std::string;
 using std::filesystem::exists;
 using std::filesystem::path;
 using waka::common::Config;
@@ -39,12 +41,25 @@ using waka::controller::getStatusBar;
 using waka::controller::getSummaries;
 using waka::controller::postHeartbeat;
 using waka::controller::putConfig;
+using waka::controller::wrapper;
 using waka::dao::HeartbeatMapper;
 using waka::dao::setDB;
 using waka::exception::DBError;
 using waka::service::MetaService;
 
-using namespace std;
+static void init();
+static void runServer();
+
+int main() {
+  try {
+    init();
+    runServer();
+  } catch (const exception& e) {
+    SPDLOG_CRITICAL("{}", e.what());
+    return 1;
+  }
+  return 0;
+}
 
 static const char* kDBPath = "./waka.db";
 
@@ -77,33 +92,25 @@ static void setupConfig() {
   Config::setConfig(std::move(config));
 }
 
-static void setupRouting(Server& server) {
-  server.Get("/api/config", getConfig);
-  server.Put("/api/config", putConfig);
-  server.Post("/api/users/current/heartbeats.bulk", postHeartbeat);
-  server.Get("/api/users/current/statusbar/today", getStatusBar);
-  server.Get("/api/summaries", getSummaries);
+static void init() {
+  setupLogger();
+  setupDB();
+  setupConfig();
 }
 
-static void runServer(const string& ip, uint16_t port) {
+static void setupRouting(Server& server) {
+  server.Post("/api/users/current/heartbeats.bulk", wrapper(postHeartbeat));
+  server.Get("/api/users/current/statusbar/today", wrapper(getStatusBar));
+  server.Get("/api/summaries", wrapper(getSummaries));
+  server.Get("/api/config", wrapper(getConfig));
+  server.Put("/api/config", wrapper(putConfig));
+}
+
+void runServer() {
   Server server;
   setupRouting(server);
-  SPDLOG_INFO("listen on '{}:{}'", ip, port);
-  server.listen(ip.c_str(), port);
-}
 
-int main() {
-  try {
-    setupLogger();
-    setupDB();
-    setupConfig();
-
-    MetaService service;
-    Config config = service.loadConfig();
-    runServer(config.ip(), config.port());
-  } catch (const exception& e) {
-    SPDLOG_CRITICAL("{}", e.what());
-  }
-
-  return 0;
+  const Config& config = Config::getConfig();
+  SPDLOG_INFO("listen on '{}:{}'", config.ip(), config.port());
+  server.listen(config.ip().c_str(), config.port());
 }

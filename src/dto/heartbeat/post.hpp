@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-namespace waka::dto::heartbeat {
+namespace waka::dto::heartbeat::post {
 
 struct Heartbeat {
   std::shared_ptr<std::string> branch;
@@ -218,6 +218,6 @@ inline std::string Result::toJson() const {
   return static_cast<nlohmann::json>(j).dump();
 }
 
-}  // namespace waka::dto::heartbeat
+}  // namespace waka::dto::heartbeat::post
 
 #endif  // WAKA_SRC_DTO_HEARTBEAT_POST_HPP_
