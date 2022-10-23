@@ -64,7 +64,7 @@ void getSummaries(const Request& req, Response& resp) {
   auto summaries = HeartbeatService{}.summarize(start, end);
 
   Result result;
-  result.total.name = format("'{}'~'{}'", start.toString(), end.toString());
+  result.total.name = format("{} {}", start.toString(), end.toString());
   result.total.time_text = formatTime(summaries.total_msec);
   result.total.total_msec = summaries.total_msec;
 
