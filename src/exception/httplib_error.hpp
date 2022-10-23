@@ -12,30 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "config.hpp"
+#ifndef WAKA_SRC_EXCEPTION_HTTPLIB_ERROR_HPP_
+#define WAKA_SRC_EXCEPTION_HTTPLIB_ERROR_HPP_
 
-#include <assert.h>
+#include "exception.hpp"
 
-#include <service/meta_service.hpp>
+namespace waka::exception {
 
-using std::make_unique;
-using std::unique_ptr;
-using waka::service::MetaService;
+class HttplibError : public Exception {
+ public:
+  explicit HttplibError(std::string reason) : Exception(std::move(reason)) {}
+};
 
-namespace waka::common {
+}  // namespace waka::exception
 
-unique_ptr<Config> Config::config_;
-
-// 在调用此函数前必须先调用initDB初始化数据库
-void Config::init() {
-  assert(!config_);
-  Config config = MetaService{}.loadConfig();
-  config_ = make_unique<Config>(std::move(config));
-}
-
-const Config& Config::get() {
-  assert(config_);
-  return *config_;
-}
-
-}  // namespace waka::common
+#endif  // WAKA_SRC_EXCEPTION_HTTPLIB_ERROR_HPP_

@@ -15,13 +15,17 @@
 #ifndef WAKA_SRC_COMMON_LOG_HPP_
 #define WAKA_SRC_COMMON_LOG_HPP_
 
+#include <spdlog/sinks/daily_file_sink.h>
 #include <spdlog/spdlog.h>
 
+#include <common/config.hpp>
+#include <define.hpp>
+#include <filesystem>
 #include <string>
 
 namespace waka::common {
 
-static std::string logLevelToString(int level) {
+[[nodiscard]] inline static std::string logLevelToString(int level) {
   switch (level) {
     case spdlog::level::trace:
       return "trace";
@@ -41,7 +45,7 @@ static std::string logLevelToString(int level) {
   return "";
 }
 
-static int stringToLogLevel(const std::string& str) {
+[[nodiscard]] inline static int stringToLogLevel(const std::string& str) {
   if (str == "trace") {
     return spdlog::level::trace;
   } else if (str == "debug") {
@@ -58,6 +62,16 @@ static int stringToLogLevel(const std::string& str) {
     return spdlog::level::off;
   }
   return -1;
+}
+
+inline static void setupLogger() {
+  auto log_path = std::filesystem::path{WAKA_DATA_DIR} / "log" / "waka.log";
+  auto logger = spdlog::daily_logger_mt("waka_logger", log_path, 0, 0);
+  spdlog::set_default_logger(logger);
+  auto level = stringToLogLevel(Config::get().logLevel());
+  spdlog::set_level(static_cast<spdlog::level::level_enum>(level));
+  spdlog::flush_on(spdlog::level::trace);
+  spdlog::set_pattern("[%Y-%m-%d %T.%e] [%l] %t [%@] -- %v");
 }
 
 }  // namespace waka::common

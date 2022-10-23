@@ -54,7 +54,7 @@ namespace waka::common {
   int hours = msec / 1000 / 3600;
   int minuates = msec / 1000 / 60 % 60;
 
-  auto config = Config::getConfig();
+  auto config = Config::get();
   std::string text = std::regex_replace(
       config.timeFormat(), std::regex{"(%HH)"}, fmt::format("{:02d}", hours));
   text = std::regex_replace(text, std::regex{"(%H)"}, std::to_string(hours));

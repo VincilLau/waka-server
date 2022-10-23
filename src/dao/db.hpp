@@ -19,11 +19,10 @@
 
 namespace waka::dao {
 
-// 设置全局数据库实例
-sqlite3* getDB();
-
+// 初始化数据库
+void initDB();
 // 获取全局数据库实例
-void setDB(sqlite3* db);
+sqlite3* getDB();
 
 }  // namespace waka::dao
 

@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_VERSION_HPP_
-#define WAKA_SRC_VERSION_HPP_
+#ifndef WAKA_SRC_DEFINE_HPP_
+#define WAKA_SRC_DEFINE_HPP_
 
-namespace waka {
+#define WAKA_DATA_DIR "./waka-data"
+#define WAKA_VERSION "${VERSION}"
+#define WAKA_PROJECT_DIR "${PROJECT_DIR}"
 
-static const char* kVersion = "0.0.0";
-
-}  // namespace waka
-
-#endif  // WAKA_SRC_VERSION_HPP_
+#endif  // WAKA_SRC_DEFINE_HPP_

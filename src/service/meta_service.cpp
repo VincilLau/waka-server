@@ -16,8 +16,8 @@
 
 #include <common/log.hpp>
 #include <common/pattern.hpp>
+#include <define.hpp>
 #include <exception/config_error.hpp>
-#include <version.hpp>
 
 using std::string;
 using std::to_string;
@@ -30,7 +30,7 @@ namespace waka::service {
 
 void MetaService::init() const {
   mapper_.createTable();
-  mapper_.insert({"version", kVersion});
+  mapper_.insert({"version", WAKA_VERSION});
   mapper_.insert({"ip", "127.0.0.1"});
   mapper_.insert({"port", "8080"});
   mapper_.insert({"log_level", "info"});

@@ -37,8 +37,8 @@ class Config {
   void setTimeout(int timeout) { timeout_ = timeout; }
   void setPort(std::uint16_t port) { port_ = port; }
 
-  static const Config& getConfig();
-  static void setConfig(Config config);
+  static void init();
+  static const Config& get();
 
  private:
   static std::unique_ptr<Config> config_;

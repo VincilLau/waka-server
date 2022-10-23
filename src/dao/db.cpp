@@ -14,20 +14,52 @@
 
 #include "db.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <cassert>
+#include <dao/heartbeat_mapper.hpp>
+#include <define.hpp>
+#include <exception/db_error.hpp>
+#include <filesystem>
+#include <service/meta_service.hpp>
+
+using fmt::format;
+using std::filesystem::create_directory;
+using std::filesystem::exists;
+using std::filesystem::path;
+using waka::exception::DBError;
+using waka::service::MetaService;
 
 namespace waka::dao {
 
 static sqlite3* DB;
 
+void initDB() {
+  if (!exists(WAKA_DATA_DIR)) {
+    create_directory(WAKA_DATA_DIR);
+  }
+
+  path db_path = path{WAKA_DATA_DIR} / "sqlite3.db";
+  bool db_exists = exists(db_path);
+
+  sqlite3* db = nullptr;
+  int ret = sqlite3_open(db_path.c_str(), &db);
+  if (ret) {
+    throw DBError(format("can't open sqlite3 database '{}'", db_path.string()));
+  }
+  DB = db;
+
+  if (!db_exists) {
+    SPDLOG_DEBUG("init meta table");
+    MetaService{}.init();
+  }
+
+  HeartbeatMapper{}.loadTables();
+}
+
 sqlite3* getDB() {
   assert(DB);
   return DB;
-}
-
-void setDB(sqlite3* db) {
-  assert(!DB);
-  DB = db;
 }
 
 }  // namespace waka::dao

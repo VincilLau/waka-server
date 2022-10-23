@@ -13,7 +13,8 @@
 -- limitations under the License.
 
 set_project("waka-server")
-set_version("0.0.0")
+version = "0.0.0"
+set_version(version)
 set_languages("c++17")
 
 add_rules("mode.debug", "mode.release")
@@ -28,6 +29,10 @@ add_requires(
 
 target("waka-server")
     set_kind("binary")
+    set_configdir("$(projectdir)/src")
+    set_configvar("VERSION", version)
+    set_configvar("PROJECT_DIR", "$(projectdir)")
+    add_configfiles("src/define.hpp.in")
     add_files("src/**.cpp")
     add_includedirs("src")
     add_defines("SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE")
