@@ -15,6 +15,7 @@
 #ifndef WAKA_SRC_BO_HEARTBEAT_HPP_
 #define WAKA_SRC_BO_HEARTBEAT_HPP_
 
+#include <cstdint>
 #include <string>
 
 namespace waka::bo {
@@ -25,7 +26,7 @@ struct Heartbeat {
   std::string entity;
   std::string language;
   std::string project;
-  double time;
+  std::int64_t time;
   std::string type;
   std::string user_agent;
 };

@@ -73,7 +73,7 @@ string HeartbeatService::save(bo::Heartbeat heartbeat) const {
   h.language = std::move(heartbeat.language);
   h.project = std::move(heartbeat.project);
   h.type = std::move(heartbeat.type);
-  h.time = int64_t(heartbeat.time * 1000);
+  h.time = heartbeat.time;
 
   auto pair = parseUserAgent(heartbeat.user_agent);
   try {

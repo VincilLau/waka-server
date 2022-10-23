@@ -55,7 +55,7 @@ void postHeartbeat(const Request& req, Response& resp) {
 
     Heartbeat heartbeat;
     heartbeat.entity = std::move(*h.entity);
-    heartbeat.time = *h.time;
+    heartbeat.time = static_cast<int64_t>(*h.time * 1000);
     if (h.branch) {
       heartbeat.branch = std::move(*h.branch);
     }
