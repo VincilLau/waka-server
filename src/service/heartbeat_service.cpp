@@ -24,6 +24,7 @@ using std::string;
 using std::stringstream;
 using std::unordered_map;
 using waka::bo::Summaries;
+using waka::common::Config;
 using waka::common::Date;
 using waka::common::parseUserAgent;
 using waka::common::uuidV4;
@@ -124,9 +125,13 @@ int64_t HeartbeatService::today() const {
     return 0;
   }
 
+  int timeout = Config::get().timeout();
   int64_t msec = 0;
   for (size_t i = 0; i < lst.size() - 1; i++) {
-    msec += lst[i + 1].time - lst[i].time;
+    int64_t duration = lst[i + 1].time - lst[i].time;
+    if (duration <= timeout * 1000) {
+      msec += duration;
+    }
   }
   return msec;
 }
@@ -134,6 +139,7 @@ int64_t HeartbeatService::today() const {
 Summaries HeartbeatService::summarize(const Date& start, const Date& end) {
   assert(start <= end);
 
+  int timeout = Config::get().timeout();
   Summaries summaries;
   for (Date date = start; date <= end; date++) {
     auto lst = mapper_.listByDate(date);
@@ -145,6 +151,9 @@ Summaries HeartbeatService::summarize(const Date& start, const Date& end) {
       auto& h1 = lst[i];
       auto& h2 = lst[i + 1];
       int64_t duration = h2.time - h1.time;
+      if (duration > timeout * 1000) {
+        continue;
+      }
 
       {
         auto it = summaries.categories.find(h1.category);
