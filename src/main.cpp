@@ -17,11 +17,11 @@
 #include <sqlite3.h>
 
 #include <common/config.hpp>
+#include <common/http.hpp>
 #include <controller/config.hpp>
 #include <controller/heartbeat.hpp>
 #include <controller/status_bar.hpp>
 #include <controller/summaries.hpp>
-#include <controller/wrapper.hpp>
 #include <dao/db.hpp>
 #include <dao/heartbeat_mapper.hpp>
 #include <exception/db_error.hpp>
@@ -30,18 +30,20 @@
 #include <service/meta_service.hpp>
 
 using fmt::format;
+using httplib::Request;
+using httplib::Response;
 using httplib::Server;
 using std::exception;
 using std::string;
 using std::filesystem::exists;
 using std::filesystem::path;
 using waka::common::Config;
+using waka::common::HttpStatus;
 using waka::controller::getConfig;
 using waka::controller::getStatusBar;
 using waka::controller::getSummaries;
 using waka::controller::postHeartbeat;
 using waka::controller::putConfig;
-using waka::controller::wrapper;
 using waka::dao::HeartbeatMapper;
 using waka::dao::setDB;
 using waka::exception::DBError;
@@ -99,11 +101,19 @@ static void init() {
 }
 
 static void setupRouting(Server& server) {
-  server.Post("/api/users/current/heartbeats.bulk", wrapper(postHeartbeat));
-  server.Get("/api/users/current/statusbar/today", wrapper(getStatusBar));
-  server.Get("/api/summaries", wrapper(getSummaries));
-  server.Get("/api/config", wrapper(getConfig));
-  server.Put("/api/config", wrapper(putConfig));
+  server.Post("/api/users/current/heartbeats.bulk", postHeartbeat);
+  server.Get("/api/users/current/statusbar/today", getStatusBar);
+  server.Get("/api/summaries", getSummaries);
+  server.Get("/api/config", getConfig);
+  server.Put("/api/config", putConfig);
+
+  // 异常处理
+  server.set_exception_handler(
+      [](const Request& req, Response& resp, exception e) {
+        resp.status = HttpStatus::kBadRequest;
+        resp.set_content(format(R"({{"message": "{}"}})", e.what()),
+                         "application/json");
+      });
 }
 
 void runServer() {
