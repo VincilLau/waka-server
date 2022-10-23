@@ -16,6 +16,7 @@
 #define WAKA_SRC_COMMON_LOG_HPP_
 
 #include <spdlog/sinks/daily_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
 #include <common/config.hpp>
@@ -23,7 +24,30 @@
 #include <filesystem>
 #include <string>
 
+#ifdef PLATFORM_LINUX
+// 导入isatty
+#include <unistd.h>
+#endif  // PLATFORM_LINUX
+
 namespace waka::common {
+
+inline static void initLogger() {
+  auto log_path = std::filesystem::path{WAKA_DATA_DIR} / "log" / "waka.log";
+  auto logger = spdlog::daily_logger_mt("waka_logger", log_path, 0, 0);
+  spdlog::set_default_logger(logger);
+
+  spdlog::set_level(spdlog::level::trace);
+  spdlog::flush_on(spdlog::level::trace);
+  spdlog::set_pattern("[%Y-%m-%d %T.%e] [%l] %t [%@] -- %v");
+
+#ifdef PLATFORM_LINUX
+  if (isatty(STDOUT_FILENO)) {
+    auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    stdout_sink->set_pattern("[%Y-%m-%d %T.%e] [%^%l%$] %t [%@] -- %v");
+    logger->sinks().push_back(stdout_sink);
+  }
+#endif  // PLATFORM_LINUX
+}
 
 [[nodiscard]] inline static std::string logLevelToString(int level) {
   switch (level) {
@@ -64,14 +88,9 @@ namespace waka::common {
   return -1;
 }
 
-inline static void setupLogger() {
-  auto log_path = std::filesystem::path{WAKA_DATA_DIR} / "log" / "waka.log";
-  auto logger = spdlog::daily_logger_mt("waka_logger", log_path, 0, 0);
-  spdlog::set_default_logger(logger);
+inline static void applyLogLevel() {
   auto level = stringToLogLevel(Config::get().logLevel());
   spdlog::set_level(static_cast<spdlog::level::level_enum>(level));
-  spdlog::flush_on(spdlog::level::trace);
-  spdlog::set_pattern("[%Y-%m-%d %T.%e] [%l] %t [%@] -- %v");
 }
 
 }  // namespace waka::common

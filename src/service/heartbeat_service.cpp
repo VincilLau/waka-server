@@ -64,32 +64,59 @@ static const unordered_map<string, string> kEditorMap = {
     {"unknown", "Unknown"},  //
 };
 
-string HeartbeatService::save(bo::Heartbeat heartbeat) const {
-  Heartbeat h;
-  h.id = uuidV4();
+string HeartbeatService::save(bo::Heartbeat bo) const {
+  Heartbeat model;
+  model.id = uuidV4();
 
-  h.branch = std::move(heartbeat.branch);
-  h.category = std::move(heartbeat.category);
-  h.entity = std::move(heartbeat.entity);
-  h.language = std::move(heartbeat.language);
-  h.project = std::move(heartbeat.project);
-  h.type = std::move(heartbeat.type);
-  h.time = heartbeat.time;
-
-  auto pair = parseUserAgent(heartbeat.user_agent);
-  try {
-    h.os = kOSMap.at(pair.first);
-  } catch (const out_of_range& e) {
-    h.os = pair.first;
-  }
-  try {
-    h.editor = kEditorMap.at(pair.second);
-  } catch (const out_of_range& e) {
-    h.editor = pair.second;
+  if (!bo.branch.empty()) {
+    model.branch = std::move(bo.branch);
+  } else {
+    model.branch = "Unknown";
   }
 
-  mapper_.insert(h);
-  return h.id;
+  if (!bo.category.empty()) {
+    model.category = std::move(bo.category);
+  } else {
+    model.category = "Unknown";
+  }
+
+  model.entity = std::move(bo.entity);
+
+  if (!bo.language.empty()) {
+    model.language = std::move(bo.language);
+  } else {
+    model.language = "Unknown";
+  }
+
+  if (!bo.project.empty()) {
+    model.project = std::move(bo.project);
+  } else {
+    model.project = "Unknown";
+  }
+
+  if (!bo.type.empty()) {
+    model.type = std::move(bo.type);
+  } else {
+    model.type = "Unknown";
+  }
+
+  model.time = bo.time;
+
+  auto pair = parseUserAgent(bo.user_agent);
+  SPDLOG_WARN("editor={}", pair.second);
+  try {
+    model.os = kOSMap.at(pair.first);
+  } catch (const out_of_range& e) {
+    model.os = pair.first;
+  }
+  try {
+    model.editor = kEditorMap.at(pair.second);
+  } catch (const out_of_range& e) {
+    model.editor = pair.second;
+  }
+
+  mapper_.insert(model);
+  return model.id;
 }
 
 int64_t HeartbeatService::today() const {

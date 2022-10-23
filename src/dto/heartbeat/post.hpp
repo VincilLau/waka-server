@@ -59,7 +59,8 @@ inline Param Param::fromJson(const std::string& json) {
   if (j.is_null()) {
     throw exception::JsonError("param can't be null");
   } else if (!j.is_array()) {
-    throw exception::JsonError("param must be a array");
+    throw exception::JsonError(
+        fmt::format("param must be a array, not {}", j.type_name()));
   }
 
   for (size_t i = 0; i < j.size(); i++) {
@@ -68,8 +69,8 @@ inline Param Param::fromJson(const std::string& json) {
     auto branch = item["branch"];
     if (!branch.is_null()) {
       if (!branch.is_string()) {
-        throw exception::JsonError(
-            fmt::format("'[{}].branch' must be a string", i));
+        throw exception::JsonError(fmt::format(
+            "'[{}].branch' must be a string, not {}", i, branch.type_name()));
       }
       heartbeat.branch = std::make_shared<std::string>(std::move(branch));
     }
@@ -78,16 +79,18 @@ inline Param Param::fromJson(const std::string& json) {
     if (!category.is_null()) {
       if (!category.is_string()) {
         throw exception::JsonError(
-            fmt::format("'[{}].category' must be a string", i));
+            fmt::format("'[{}].category' must be a string, not {}", i,
+                        category.type_name()));
       }
       heartbeat.category = std::make_shared<std::string>(std::move(category));
     }
 
     auto cursorpos = item["cursorpos"];
     if (!cursorpos.is_null()) {
-      if (!cursorpos.is_string()) {
+      if (!cursorpos.is_number_integer()) {
         throw exception::JsonError(
-            fmt::format("'[{}].cursorpos' must be a integer", i));
+            fmt::format("'[{}].cursorpos' must be a integer, not {}", i,
+                        cursorpos.type_name()));
       }
       heartbeat.cursorpos = std::make_shared<int>(cursorpos);
     }
@@ -96,14 +99,16 @@ inline Param Param::fromJson(const std::string& json) {
     if (!dependencies.is_null()) {
       if (!dependencies.is_array()) {
         throw exception::JsonError(
-            fmt::format("'[{}].dependencies' must be a array", i));
+            fmt::format("'[{}].dependencies' must be a array, not {}", i,
+                        dependencies.type_name()));
       }
       heartbeat.dependencies = std::make_shared<std::vector<std::string>>();
-      for (size_t j = 0; j < dependencies.size(); j++) {
-        const auto& d = dependencies[i];
+      for (size_t k = 0; k < dependencies.size(); k++) {
+        const auto& d = dependencies[k];
         if (!d.is_string()) {
           throw exception::JsonError(
-              fmt::format("'[{}].dependencies[{}]' must be a array", i, j));
+              fmt::format("'[{}].dependencies[{}]' must be a string, not {}", i,
+                          k, d.type_name()));
         }
         heartbeat.dependencies->push_back(std::move(d));
       }
@@ -112,8 +117,8 @@ inline Param Param::fromJson(const std::string& json) {
     auto entity = item["entity"];
     if (!entity.is_null()) {
       if (!entity.is_string()) {
-        throw exception::JsonError(
-            fmt::format("'[{}].entity' must be a string", i));
+        throw exception::JsonError(fmt::format(
+            "'[{}].entity' must be a string, not {}", i, entity.type_name()));
       }
       heartbeat.entity = std::make_shared<std::string>(std::move(entity));
     }
@@ -121,17 +126,17 @@ inline Param Param::fromJson(const std::string& json) {
     auto type = item["type"];
     if (!type.is_null()) {
       if (!type.is_string()) {
-        throw exception::JsonError(
-            fmt::format("'[{}].type' must be a string", i));
+        throw exception::JsonError(fmt::format(
+            "'[{}].type' must be a string, not {}", i, type.type_name()));
       }
       heartbeat.type = std::make_shared<std::string>(std::move(type));
     }
 
     auto is_write = item["is_write"];
     if (!is_write.is_null()) {
-      if (!is_write.is_string()) {
-        throw exception::JsonError(
-            fmt::format("'[{}].is_write' must be a bool", i));
+      if (!is_write.is_boolean()) {
+        throw exception::JsonError(fmt::format(
+            "'[{}].is_write' must be a bool, not {}", i, is_write.type_name()));
       }
       heartbeat.is_write = std::make_shared<bool>(is_write);
     }
@@ -140,16 +145,17 @@ inline Param Param::fromJson(const std::string& json) {
     if (!language.is_null()) {
       if (!language.is_string()) {
         throw exception::JsonError(
-            fmt::format("'[{}].language' must be a string", i));
+            fmt::format("'[{}].language' must be a string, not {}", i,
+                        language.type_name()));
       }
       heartbeat.language = std::make_shared<std::string>(std::move(language));
     }
 
     auto lineno = item["lineno"];
     if (!lineno.is_null()) {
-      if (!lineno.is_string()) {
-        throw exception::JsonError(
-            fmt::format("'[{}].lineno' must be a integer", i));
+      if (!lineno.is_number_integer()) {
+        throw exception::JsonError(fmt::format(
+            "'[{}].lineno' must be a integer, not {}", i, lineno.type_name()));
       }
       heartbeat.lineno = std::make_shared<int>(lineno);
     }
@@ -157,8 +163,8 @@ inline Param Param::fromJson(const std::string& json) {
     auto lines = item["lines"];
     if (!lines.is_null()) {
       if (!lines.is_number_integer()) {
-        throw exception::JsonError(
-            fmt::format("'[{}].lines' must be a integer", i));
+        throw exception::JsonError(fmt::format(
+            "'[{}].lines' must be a integer, not {}", i, lines.type_name()));
       }
       heartbeat.lines = std::make_shared<int>(std::move(lines));
     }
@@ -166,8 +172,8 @@ inline Param Param::fromJson(const std::string& json) {
     auto project = item["project"];
     if (!project.is_null()) {
       if (!project.is_string()) {
-        throw exception::JsonError(
-            fmt::format("'[{}].project' must be a string", i));
+        throw exception::JsonError(fmt::format(
+            "'[{}].project' must be a string, not {}", i, project.type_name()));
       }
       heartbeat.project = std::make_shared<std::string>(std::move(project));
     }
@@ -175,8 +181,8 @@ inline Param Param::fromJson(const std::string& json) {
     auto time = item["time"];
     if (!time.is_null()) {
       if (!time.is_number_float()) {
-        throw exception::JsonError(
-            fmt::format("'[{}].time' must be a float number", i));
+        throw exception::JsonError(fmt::format(
+            "'[{}].time' must be a float number, not {}", i, time.type_name()));
       }
       heartbeat.time = std::make_shared<double>(time);
     }
@@ -185,7 +191,8 @@ inline Param Param::fromJson(const std::string& json) {
     if (!user_agent.is_null()) {
       if (!user_agent.is_string()) {
         throw exception::JsonError(
-            fmt::format("'[{}].user_agent' must be a string", i));
+            fmt::format("'[{}].user_agent' must be a string, not {}", i,
+                        user_agent.type_name()));
       }
       heartbeat.user_agent =
           std::make_shared<std::string>(std::move(user_agent));
@@ -206,15 +213,17 @@ struct Result {
 };
 
 inline std::string Result::toJson() const {
-  nlohmann::json::array_t j;
+  nlohmann::json::object_t j;
+  nlohmann::json::array_t resps;
   for (const auto& resp : responses) {
     nlohmann::json::array_t pair;
     pair.push_back({
         {"data", {{"id", resp.first}}},
     });
     pair.push_back(resp.second);
-    j.push_back(std::move(pair));
+    resps.push_back(std::move(pair));
   }
+  j["responses"] = std::move(resps);
   return static_cast<nlohmann::json>(j).dump();
 }
 

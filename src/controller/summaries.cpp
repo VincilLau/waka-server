@@ -14,6 +14,8 @@
 
 #include "summaries.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <common/date.hpp>
 #include <common/http.hpp>
 #include <common/pattern.hpp>
@@ -52,6 +54,10 @@ void getSummaries(const Request& req, Response& resp) {
   if (start > end) {
     resp.status = HttpStatus::kBadRequest;
     resp.set_content("start can't be greater than end", "application/json");
+    SPDLOG_WARN(
+        format("GET /api/summaries 400, msg='start({}) can't be greater "
+               "than end({})'",
+               start.toString(), end.toString()));
     return;
   }
 
@@ -104,6 +110,7 @@ void getSummaries(const Request& req, Response& resp) {
 
   resp.status = HttpStatus::kOK;
   resp.set_content(result.toJson(), "application/json");
+  SPDLOG_INFO("GET /api/summaries 200");
 }
 
 }  // namespace waka::controller

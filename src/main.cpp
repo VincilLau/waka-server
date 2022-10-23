@@ -23,28 +23,29 @@
 
 using httplib::Server;
 using std::exception;
+using waka::common::applyLogLevel;
 using waka::common::Config;
-using waka::common::setupLogger;
+using waka::common::initLogger;
 using waka::controller::setupRouting;
 using waka::dao::initDB;
 
 static void init() {
+  initLogger();
   // 打开数据库
   // 如果数据库不存在则创建数据库并初始化meta表
   // 加载数据库中的heartbeat表
   initDB();
   // 从meta表中读取配置
   Config::init();
-  // 将日志输出从stdout重定向到文件
   // 根据配置设置日志级别
-  setupLogger();
+  applyLogLevel();
 }
 
-void runServer() {
+static void runServer() {
   Server server;
   setupRouting(server);
   const Config& config = Config::get();
-  SPDLOG_INFO("listen on '{}:{}'", config.ip(), config.port());
+  SPDLOG_INFO("listen on {}:{}", config.ip(), config.port());
   server.listen(config.ip().c_str(), config.port());
 }
 

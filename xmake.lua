@@ -45,3 +45,7 @@ target("waka-server")
         "spdlog",
         "sqlite"
     )
+
+    if is_plat("linux") then
+        add_defines("PLATFORM_LINUX=1")
+    end

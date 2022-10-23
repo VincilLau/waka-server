@@ -57,6 +57,7 @@ void getConfig(const Request& req, Response& resp) {
 
   resp.status = HttpStatus::kOK;
   resp.set_content(result.toJson(), "application/json");
+  SPDLOG_INFO("GET /api/config 200");
 }
 
 static string parsePutConfigBody(const string& body, Param& param) {
@@ -87,6 +88,8 @@ void putConfig(const Request& req, Response& resp) {
   if (!msg.empty()) {
     resp.status = HttpStatus::kBadRequest;
     resp.set_content(msg, "application/json");
+    SPDLOG_WARN("PUT /api/config 400, msg='{}', data='{}'", msg, req.body);
+    return;
   }
 
   Config config;
@@ -99,6 +102,7 @@ void putConfig(const Request& req, Response& resp) {
 
   resp.status = HttpStatus::kOK;
   resp.set_content(jsonMsg("ok"), "application/json");
+  SPDLOG_INFO("PUT /api/config 200");
 }
 
 }  // namespace waka::controller

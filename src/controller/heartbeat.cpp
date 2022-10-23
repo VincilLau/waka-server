@@ -14,6 +14,8 @@
 
 #include "heartbeat.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <bo/heartbeat.hpp>
 #include <common/http.hpp>
 #include <dao/heartbeat_mapper.hpp>
@@ -66,6 +68,9 @@ void postHeartbeat(const Request& req, Response& resp) {
   } catch (const JsonError& e) {
     resp.status = HttpStatus::kBadRequest;
     resp.set_content(jsonMsg(e.what()), "application/json");
+    SPDLOG_WARN(
+        "POST /api/users/current/heartbeats.bulk 400, msg='{}', data='{}'",
+        e.what(), req.body);
     return;
   }
 
@@ -73,8 +78,29 @@ void postHeartbeat(const Request& req, Response& resp) {
   HeartbeatService service;
   for (size_t i = 0; i < param.heartbeats.size(); i++) {
     auto& dto = param.heartbeats[i];
-    if (!dto.entity || !dto.time) {
+    if (!dto.entity) {
       result.responses[i].second = HttpStatus::kBadRequest;
+      SPDLOG_WARN(
+          "POST /api/users/current/heartbeats.bulk 400, index={}, "
+          "msg='entity "
+          "can't be null'",
+          i);
+      continue;
+    }
+    if (!dto.time) {
+      result.responses[i].second = HttpStatus::kBadRequest;
+      SPDLOG_WARN(
+          "POST /api/users/current/heartbeats.bulk 400, index={}, msg='time "
+          "can't be null'",
+          i);
+      continue;
+    }
+    if (dto.entity->empty()) {
+      result.responses[i].second = HttpStatus::kBadRequest;
+      SPDLOG_WARN(
+          "POST /api/users/current/heartbeats.bulk 400, index={}, msg='entity "
+          "can't be empty'",
+          i);
       continue;
     }
 
@@ -84,13 +110,18 @@ void postHeartbeat(const Request& req, Response& resp) {
     } catch (const std::exception& e) {
       resp.status = HttpStatus::kInternalServerError;
       resp.set_content(jsonMsg(e.what()), "application/json");
+      SPDLOG_WARN(
+          "POST /api/users/current/heartbeats.bulk 500, index={}, msg='{}'", i,
+          e.what());
       return;
     }
     result.responses[i].second = HttpStatus::kCreated;
+    SPDLOG_INFO("POST /api/users/current/heartbeats.bulk 201, index={}", i);
   }
 
   resp.status = HttpStatus::kAccepted;
   resp.set_content(result.toJson(), "application/json");
+  SPDLOG_INFO("POST /api/users/current/heartbeats.bulk 202");
 }
 
 }  // namespace waka::controller

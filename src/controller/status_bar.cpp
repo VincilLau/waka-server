@@ -14,6 +14,8 @@
 
 #include "status_bar.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <common/http.hpp>
 #include <common/pattern.hpp>
 #include <dto/status_bar/get.hpp>
@@ -33,6 +35,7 @@ void getStatusBar(const Request& req, Response& resp) {
   Result result(formatTime(msec));
   resp.status = HttpStatus::kOK;
   resp.set_content(result.toJson(), "application/json");
+  SPDLOG_INFO("GET /api/users/current/statusbar/today 200");
 }
 
 }  // namespace waka::controller

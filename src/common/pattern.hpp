@@ -39,7 +39,11 @@ namespace waka::common {
 // 返回值为{os, editor}
 [[nodiscard]] inline static std::pair<std::string, std::string> parseUserAgent(
     const std::string& ua) {
-  std::regex pattern(R"(^wakatime/.+ \((.+?)-.+-.+\) .+ (.+)/.+$)");
+  std::regex pattern(
+      "^wakatime/.+? "
+      "\\((.+?)-.+\\) "
+      ".+? "
+      "(.+?)/.+?");
   std::smatch matches;
   if (std::regex_match(ua, matches, pattern)) {
     assert(matches.size() == 3);

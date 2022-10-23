@@ -17,6 +17,7 @@
 
 #include <fmt/core.h>
 #include <httplib.h>
+#include <spdlog/spdlog.h>
 
 #include <common/http.hpp>
 
@@ -26,12 +27,14 @@ inline static void notFound(const httplib::Request& req,
                             httplib::Response& resp) {
   resp.status = common::HttpStatus::kNotFound;
   resp.set_content(R"({"message":"not found"})", "application/json");
+  SPDLOG_WARN("{} {} 404", req.method, req.path);
 }
 
 inline static void methodNotAllowed(const httplib::Request& req,
                                     httplib::Response& resp) {
   resp.status = common::HttpStatus::kMethodNotAllowed;
   resp.set_content(R"({"message":"method not allowed"})", "application/json");
+  SPDLOG_WARN("{} {} 405", req.method, req.path);
 }
 
 inline static void exceptionHandler(const httplib::Request& req,
@@ -39,6 +42,7 @@ inline static void exceptionHandler(const httplib::Request& req,
   resp.status = common::HttpStatus::kInternalServerError;
   resp.set_content(fmt::format(R"({{"message":"{}"}})", e.what()),
                    "application/json");
+  SPDLOG_WARN("{} {} 500: {}", req.method, req.path, e.what());
 }
 
 }  // namespace waka::controller

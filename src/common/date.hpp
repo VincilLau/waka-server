@@ -129,14 +129,14 @@ class Date {
     std::regex pattern{"^(\\d{4})-(\\d{2})-(\\d{2})$"};
     std::smatch matches;
     if (!std::regex_match(str, matches, pattern)) {
-      throw exception::DateError(str);
+      throw exception::DateError(fmt::format("invalid date ({})", str));
     }
     assert(matches.size() == 4);
     int year = atoi(matches[1].str().c_str());
     int month = atoi(matches[2].str().c_str());
     int day = atoi(matches[3].str().c_str());
     if (year <= 0 || month <= 0 || day <= 0) {
-      throw exception::DateError(str);
+      throw exception::DateError(fmt::format("invalid date ({})", str));
     }
     return {year, month, day};
   }

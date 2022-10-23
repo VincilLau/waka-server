@@ -15,6 +15,8 @@
 #ifndef WAKA_SRC_DTO_CONFIG_PUT_HPP_
 #define WAKA_SRC_DTO_CONFIG_PUT_HPP_
 
+#include <fmt/format.h>
+
 #include <exception/json_error.hpp>
 #include <nlohmann/json.hpp>
 #include <string>
@@ -44,7 +46,8 @@ inline Param Param::fromJson(const std::string& json) {
   if (j.is_null()) {
     throw exception::JsonError("param can't be null");
   } else if (!j.is_object()) {
-    throw exception::JsonError("param must be a object");
+    throw exception::JsonError(
+        fmt::format("param must be a object, not {}", j.type_name()));
   }
 
   auto ip = j["ip"];
@@ -66,15 +69,20 @@ inline Param Param::fromJson(const std::string& json) {
   }
 
   if (!ip.is_string()) {
-    throw exception::JsonError("'ip' must be a string");
+    throw exception::JsonError(
+        fmt::format("'ip' must be a string, not {}", j.type_name()));
   } else if (!log_level.is_string()) {
-    throw exception::JsonError("'log_level' must be a string");
+    throw exception::JsonError(
+        fmt::format("'log_level' must be a string, not {}", j.type_name()));
   } else if (!port.is_number_integer()) {
-    throw exception::JsonError("'port' must be a integer");
+    throw exception::JsonError(
+        fmt::format("'port' must be a integer, not {}", j.type_name()));
   } else if (!timeout.is_number_integer()) {
-    throw exception::JsonError("'timeout' must be a integer");
+    throw exception::JsonError(
+        fmt::format("'timeout' must be a integer, not {}", j.type_name()));
   } else if (!time_format.is_string()) {
-    throw exception::JsonError("'time_format' must be a string");
+    throw exception::JsonError(
+        fmt::format("'time_format' must be a string, not {}", j.type_name()));
   }
 
   param.ip = ip;
