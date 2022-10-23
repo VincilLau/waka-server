@@ -103,7 +103,6 @@ string HeartbeatService::save(bo::Heartbeat bo) const {
   model.time = bo.time;
 
   auto pair = parseUserAgent(bo.user_agent);
-  SPDLOG_WARN("editor={}", pair.second);
   try {
     model.os = kOSMap.at(pair.first);
   } catch (const out_of_range& e) {
