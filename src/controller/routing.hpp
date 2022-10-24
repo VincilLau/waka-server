@@ -31,6 +31,11 @@ inline static void index(const httplib::Request& req, httplib::Response& resp) {
 }
 
 inline static void mountStaticFile(httplib::Server& server) {
+  server.set_file_request_handler(
+      [](const httplib::Request& req, httplib::Response& resp) {
+        // 打开keep-alive后响应缓慢
+        resp.set_header("Connection", "close");
+      });
   server.set_mount_point(
       "/css", std::filesystem::path{WAKA_PROJECT_DIR} / "assets" / "css");
   server.set_mount_point("/dashboard", std::filesystem::path{WAKA_PROJECT_DIR} /
