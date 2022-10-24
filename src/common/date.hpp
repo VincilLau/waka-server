@@ -119,6 +119,22 @@ class Date {
     return static_cast<int64_t>(t) * 1000;
   }
 
+  [[nodiscard]] bool valid() const {
+    if (year_ < 2000 || year_ > 2099) {
+      return false;
+    }
+    if (month_ < 1 || month_ > 12) {
+      return false;
+    }
+
+    int month_days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    month_days[1] += isLeapYear();
+    if (day_ > month_days[month_ - 1]) {
+      return false;
+    }
+    return true;
+  }
+
   static Date today() {
     time_t t = time(nullptr);
     struct tm* tm = localtime(&t);
@@ -138,7 +154,13 @@ class Date {
     if (year <= 0 || month <= 0 || day <= 0) {
       throw exception::DateError(fmt::format("invalid date ({})", str));
     }
-    return {year, month, day};
+
+    Date date{year, month, day};
+    if (!date.valid()) {
+      throw exception::DateError(fmt::format("invalid date ({})", str));
+    }
+
+    return date;
   }
 
  private:
@@ -149,10 +171,10 @@ class Date {
     int month_days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     month_days[1] += isLeapYear();
     int month_day = month_days[month_ - 1];
-    if (day_ < month_day) {
+    if (day_ <= month_day) {
       return;
     }
-    assert(day_ == month_day);
+    assert(day_ == month_day + 1);
     day_ = 1;
     if (month_ > 12) {
       month_ = 1;
