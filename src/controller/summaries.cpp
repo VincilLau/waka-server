@@ -64,9 +64,14 @@ void getSummaries(const Request& req, Response& resp) {
   auto summaries = HeartbeatService{}.summarize(start, end);
 
   Result result;
-  result.total.name = format("{} {}", start.toString(), end.toString());
+  result.total.start = start.toString();
+  result.total.end = end.toString();
   result.total.time_text = formatTime(summaries.total_msec);
   result.total.total_msec = summaries.total_msec;
+
+  for (int64_t msec : summaries.msec_per_day) {
+    result.days.push_back({msec, formatTime(msec)});
+  }
 
   for (auto& i : summaries.categories) {
     Summary s;

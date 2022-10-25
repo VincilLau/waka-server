@@ -52,26 +52,60 @@ inline nlohmann::json SummaryArray::toJson() const {
   return j;
 }
 
+struct Day {
+  [[nodiscard]] nlohmann::json toJson() const;
+
+  std::int64_t total_msec;
+  std::string time_text;
+};
+
+inline nlohmann::json Day::toJson() const {
+  return {{"total_msec", total_msec}, {"time_text", time_text}};
+}
+
+struct Total {
+  [[nodiscard]] nlohmann::json toJson() const;
+
+  std::string end;
+  std::string start;
+  std::string time_text;
+  std::int64_t total_msec;
+};
+
+inline nlohmann::json Total::toJson() const {
+  return {
+      {"end", end},
+      {"start", start},
+      {"time_text", time_text},
+      {"total_msec", total_msec},
+  };
+}
+
 struct Result {
   [[nodiscard]] std::string toJson() const;
 
   SummaryArray categories;
+  std::vector<Day> days;
   SummaryArray editors;
   SummaryArray languages;
   SummaryArray oss;
   SummaryArray projects;
-  Summary total;
+  Total total;
 };
 
 inline std::string Result::toJson() const {
-  nlohmann::json j = {
-      {"categories", categories.toJson()},  //
-      {"editors", editors.toJson()},        //
-      {"languages", languages.toJson()},    //
-      {"oss", oss.toJson()},                //
-      {"projects", projects.toJson()},      //
-      {"total", total.toJson()},            //
-  };
+  nlohmann::json::array_t days_json;
+  for (const auto& day : days) {
+    days_json.push_back(day.toJson());
+  }
+
+  nlohmann::json j = {{"categories", categories.toJson()},  //
+                      {"editors", editors.toJson()},        //
+                      {"languages", languages.toJson()},    //
+                      {"oss", oss.toJson()},                //
+                      {"projects", projects.toJson()},      //
+                      {"total", total.toJson()},            //
+                      {"days", days_json}};                 //
   return j.dump();
 }
 

@@ -14,6 +14,8 @@
 
 #include "heartbeat_service.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <common/pattern.hpp>
 #include <common/uuid.hpp>
 #include <model/heartbeat.hpp>
@@ -138,15 +140,18 @@ int64_t HeartbeatService::today() const {
 
 Summaries HeartbeatService::summarize(const Date& start, const Date& end) {
   assert(start <= end);
+  SPDLOG_DEBUG("summarize, start={}, end={}", start.toString(), end.toString());
 
   int timeout = Config::get().timeout();
   Summaries summaries;
   for (Date date = start; date <= end; date++) {
     auto lst = mapper_.listByDate(date);
     if (lst.empty()) {
+      summaries.msec_per_day.push_back(0);
       continue;
     }
 
+    int64_t msec_this_day = 0;
     for (size_t i = 0; i < lst.size() - 1; i++) {
       auto& h1 = lst[i];
       auto& h2 = lst[i + 1];
@@ -200,8 +205,11 @@ Summaries HeartbeatService::summarize(const Date& start, const Date& end) {
         }
       }
 
-      summaries.total_msec += duration;
+      msec_this_day += duration;
     }
+
+    summaries.msec_per_day.push_back(msec_this_day);
+    summaries.total_msec += msec_this_day;
   }
 
   return summaries;

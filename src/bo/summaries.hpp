@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace waka::bo {
 
@@ -28,6 +29,7 @@ struct Summaries {
   std::unordered_map<std::string, std::int64_t> oss;
   std::unordered_map<std::string, std::int64_t> projects;
   std::int64_t total_msec = 0;
+  std::vector<std::int64_t> msec_per_day;
 };
 
 }  // namespace waka::bo
