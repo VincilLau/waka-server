@@ -21,7 +21,6 @@ function initIcon() {
         url: src,
         el: this,
         success: function (resp) {
-          console.log(resp.getElementById("icon").outerHTML);
           $(this.el).html(resp.getElementById("icon").outerHTML);
         },
         error: function (resp) {

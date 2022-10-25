@@ -18,6 +18,50 @@ html,
 body {
   height: 100%;
   margin: 0;
+  overflow-y: hidden;
   padding: 0;
   width: 100%;
+}
+
+main {
+  height: 100%;
+  left: 130px;
+  overflow-y: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+#title {
+  font-size: 22px;
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+#title-day {
+  font-weight: bold;
+}
+
+#title-time {
+  color: #36558b;
+  text-decoration: underline dotted;
+}
+
+#line-chart {
+  height: 300px;
+  margin-left: 5%;
+  margin-right: 5%;
+  width: 90%;
+}
+
+#charts {
+  width: 100%;
+}
+
+.card {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  border-radius: 8px;
 }
