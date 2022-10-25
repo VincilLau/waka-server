@@ -117,7 +117,7 @@ static int listAllCallback(void* metas, int n, char** texts, char** names) {
   assert(string{names[1]} == "value");
 
   auto v = static_cast<vector<Meta>*>(metas);
-  v->emplace_back(texts[0], texts[1]);
+  v->push_back({texts[0], texts[1]});
   return 0;
 }
 

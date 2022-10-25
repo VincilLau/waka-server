@@ -27,14 +27,13 @@ using waka::common::applyLogLevel;
 using waka::common::Config;
 using waka::common::initLogger;
 using waka::controller::setupRouting;
-using waka::dao::initDB;
 
 static void init() {
   initLogger();
   // 打开数据库
   // 如果数据库不存在则创建数据库并初始化meta表
   // 加载数据库中的heartbeat表
-  initDB();
+  // initDB();
   // 从meta表中读取配置
   Config::init();
   // 根据配置设置日志级别

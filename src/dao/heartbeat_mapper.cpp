@@ -90,15 +90,13 @@ void HeartbeatMapper::insert(const Heartbeat& heartbeat) const {
 
   string sql = format(kInsertSql, table,
                       heartbeat.branch,    //
-                      heartbeat.category,  //
                       heartbeat.editor,    //
                       heartbeat.entity,    //
                       heartbeat.id,        //
                       heartbeat.language,  //
                       heartbeat.os,        //
                       heartbeat.project,   //
-                      heartbeat.time,      //
-                      heartbeat.type       //
+                      heartbeat.time       //
   );
   char* errmsg = nullptr;
   int ret = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &errmsg);
@@ -180,7 +178,6 @@ static int listByDateCallback(void* v, int n, char** texts, char** names) {
   auto lst = static_cast<vector<Heartbeat>*>(v);
   Heartbeat h;
   h.branch = texts[0];
-  h.category = texts[1];
   h.editor = texts[2];
   h.entity = texts[3];
   h.id = texts[4];
@@ -188,7 +185,6 @@ static int listByDateCallback(void* v, int n, char** texts, char** names) {
   h.os = texts[6];
   h.project = texts[7];
   h.time = atoll(texts[8]);
-  h.type = texts[9];
   lst->push_back(std::move(h));
 
   return 0;

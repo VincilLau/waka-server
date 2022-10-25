@@ -29,15 +29,16 @@ add_requires(
 
 target("waka-server")
     set_kind("binary")
-    set_configdir("$(projectdir)/src")
-    set_configvar("VERSION", version)
-    set_configvar("PROJECT_DIR", "$(projectdir)")
-    add_configfiles("src/define.hpp.in")
-    add_files("src/**.cpp")
+    add_files("src/main.cpp")
     add_includedirs("src")
+
     add_defines("SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE")
     add_defines("SPDLOG_FMT_EXTERNAL=ON")
     add_defines("CPPHTTPLIB_THREAD_POOL_COUNT=1")
+
+    add_deps("waka-server_static")
+    add_links("waka-server_static")
+
     add_packages(
         "cpp-httplib",
         "fmt",
@@ -46,6 +47,36 @@ target("waka-server")
         "sqlite"
     )
 
+target("waka-server_static")
+    set_kind("static")
+
+    set_configdir("$(projectdir)/src")
+    set_configvar("WAKA_VERSION", version)
+    set_configvar("WAKA_PROJECT_DIR", "$(projectdir)")
+    add_configfiles("src/define.hpp.in")
+
+    add_files("src/common/*.cpp")
+    add_files("src/controller/*.cpp")
+    add_files("src/dao/*.cpp")
+    add_files("src/service/*.cpp")
+
+    add_includedirs("src")
+
+    add_defines("SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE")
+    add_defines("SPDLOG_FMT_EXTERNAL=ON")
+
     if is_plat("linux") then
-        add_defines("PLATFORM_LINUX=1")
+        add_defines("WAKA_PLATFORM=WAKA_PLATFORM_LINUX")
+    elseif is_plat("windows") then
+        add_defines("WAKA_PLATFORM=WAKA_PLATFORM_WINDOWS")
     end
+
+    add_packages(
+        "cpp-httplib",
+        "fmt",
+        "nlohmann_json",
+        "spdlog",
+        "sqlite"
+    )
+
+includes("test")

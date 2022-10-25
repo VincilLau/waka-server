@@ -12,24 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_MODEL_CONFIG_HPP_
-#define WAKA_SRC_MODEL_CONFIG_HPP_
-
-#include <sqlite3.h>
+#ifndef WAKA_SRC_MODEL_META_HPP_
+#define WAKA_SRC_MODEL_META_HPP_
 
 #include <string>
 
 namespace waka::model {
 
-// 存储waka-server的元数据
+// 存储在数据库中的键值对元数据
+// 对应数据库中的meta表
+// 主键为key
 struct Meta {
  public:
-  Meta(std::string k, std::string v) : key(std::move(k)), value(std::move(v)) {}
-
   std::string key;
   std::string value;
 };
 
 }  // namespace waka::model
 
-#endif  // WAKA_SRC_MODEL_CONFIG_HPP_
+#endif  // WAKA_SRC_MODEL_META_HPP_

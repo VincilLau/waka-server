@@ -14,52 +14,79 @@
 
 #include "db.hpp"
 
-#include <spdlog/spdlog.h>
+#include <fmt/core.h>
 
 #include <cassert>
-#include <dao/heartbeat_mapper.hpp>
-#include <define.hpp>
 #include <exception/db_error.hpp>
 #include <filesystem>
-#include <service/meta_service.hpp>
 
 using fmt::format;
-using std::filesystem::create_directory;
+using std::string;
 using std::filesystem::exists;
-using std::filesystem::path;
+using std::filesystem::is_directory;
+using std::filesystem::perms;
+using std::filesystem::status;
 using waka::exception::DBError;
-using waka::service::MetaService;
 
 namespace waka::dao {
 
-static sqlite3* DB;
+// DAO层访问的数据库连接对象
+// 在使用mapper前必须调用setDB将此变量设置为有效的数据库连接对象
+static DB daoDB = nullptr;
 
-void initDB() {
-  if (!exists(WAKA_DATA_DIR)) {
-    create_directory(WAKA_DATA_DIR);
-  }
-
-  path db_path = path{WAKA_DATA_DIR} / "sqlite3.db";
-  bool db_exists = exists(db_path);
-
-  sqlite3* db = nullptr;
-  int ret = sqlite3_open(db_path.c_str(), &db);
-  if (ret) {
-    throw DBError(format("can't open sqlite3 database '{}'", db_path.string()));
-  }
-  DB = db;
-
-  if (!db_exists) {
-    SPDLOG_DEBUG("init meta table");
-    MetaService{}.init();
-  }
-
-  HeartbeatMapper{}.loadTables();
+DB getDB() noexcept {
+  assert(daoDB != nullptr);
+  return daoDB;
 }
 
-sqlite3* getDB() {
-  assert(DB);
-  return DB;
+void setDB(DB db) noexcept {
+  assert(db != nullptr);
+  assert(daoDB == nullptr);
+  daoDB = db;
+}
+
+// 检查waka-server的数据目录是否满足以下条件
+// 1. 存在
+// 2. 必须是目录
+// 3. 用户对该目录拥有rwx权限
+// 如果没有问题，返回空字符串；否则返回错误信息
+[[nodiscard]] static string checkDataDir(const string& data_dir) noexcept {
+  assert(!data_dir.empty());
+
+  try {
+    if (!exists(data_dir)) {
+      return format("{} doesn't exist", data_dir);
+    }
+    if (!is_directory(data_dir)) {
+      return format("{} isn't a dir", data_dir);
+    }
+    auto perms = status(data_dir).permissions();
+    if ((perms & perms::owner_all) != perms::owner_all) {
+      return format("no rwx permission on {}", data_dir);
+    }
+    return {};
+  } catch (const std::exception& e) {
+    return format("waka::checkDataDir e.what={}", e.what());
+  }
+}
+
+DB openDB(const std::string& data_dir) {
+  assert(!data_dir.empty());
+
+  string what = checkDataDir(data_dir);
+  if (!what.empty()) {
+    throw DBError(std::move(what));
+  }
+
+  string db_path = data_dir + "/sqlite3.db";
+  DB db = nullptr;
+  int ret = sqlite3_open(db_path.c_str(), &db);
+  if (ret) {
+    string what =
+        format("can't open or create sqlite3 database on {}", db_path);
+    throw DBError(std::move(what));
+  }
+  return db;
 }
 
 }  // namespace waka::dao

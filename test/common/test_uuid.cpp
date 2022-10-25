@@ -12,17 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_COMMON_UUID_HPP_
-#define WAKA_SRC_COMMON_UUID_HPP_
+#include <gtest/gtest.h>
 
-#include <string>
+#include <common/uuid.hpp>
+#include <regex>
+
+using std::regex;
+using std::regex_match;
+using std::string;
 
 namespace waka::common {
 
-// 生成一个vserion 4的UUID
-// 生成的UUID中字母为小写
-[[nodiscard]] std::string genUUIDv4();
+static const regex kUUIDPattern{"^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$"};
+
+TEST(UUIDTest, testGenUUIDv4) {
+  string uuid = genUUIDv4();
+  EXPECT_TRUE(regex_match(uuid, kUUIDPattern));
+  uuid = genUUIDv4();
+  EXPECT_TRUE(regex_match(uuid, kUUIDPattern));
+  uuid = genUUIDv4();
+  EXPECT_TRUE(regex_match(uuid, kUUIDPattern));
+}
 
 }  // namespace waka::common
-
-#endif  // WAKA_SRC_COMMON_UUID_HPP_

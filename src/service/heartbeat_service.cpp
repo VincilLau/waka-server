@@ -28,8 +28,8 @@ using std::unordered_map;
 using waka::bo::Summaries;
 using waka::common::Config;
 using waka::common::Date;
+using waka::common::genUUIDv4;
 using waka::common::parseUserAgent;
-using waka::common::uuidV4;
 using waka::model::Heartbeat;
 
 namespace waka::service {
@@ -69,18 +69,12 @@ static const unordered_map<string, string> kEditorMap = {
 
 string HeartbeatService::save(bo::Heartbeat bo) const {
   Heartbeat model;
-  model.id = uuidV4();
+  model.id = genUUIDv4();
 
   if (!bo.branch.empty()) {
     model.branch = std::move(bo.branch);
   } else {
     model.branch = "Unknown";
-  }
-
-  if (!bo.category.empty()) {
-    model.category = std::move(bo.category);
-  } else {
-    model.category = "Unknown";
   }
 
   model.entity = std::move(bo.entity);
@@ -95,12 +89,6 @@ string HeartbeatService::save(bo::Heartbeat bo) const {
     model.project = std::move(bo.project);
   } else {
     model.project = "Unknown";
-  }
-
-  if (!bo.type.empty()) {
-    model.type = std::move(bo.type);
-  } else {
-    model.type = "Unknown";
   }
 
   model.time = bo.time;
@@ -158,15 +146,6 @@ Summaries HeartbeatService::summarize(const Date& start, const Date& end) {
       int64_t duration = h2.time - h1.time;
       if (duration > timeout * 1000) {
         continue;
-      }
-
-      {
-        auto it = summaries.categories.find(h1.category);
-        if (it != summaries.categories.end()) {
-          it->second += duration;
-        } else {
-          summaries.categories.insert({std::move(h1.category), duration});
-        }
       }
 
       {

@@ -18,15 +18,17 @@
 
 using std::default_random_engine;
 using std::random_device;
+using std::size_t;
 using std::string;
+using std::uint16_t;
 using std::uniform_int_distribution;
 
 namespace waka::common {
 
-static constexpr size_t kUuidLength = 36;
+static constexpr size_t kUUIDLength = 36;
 
-string uuidV4() {
-  string uuid(kUuidLength, '-');
+string genUUIDv4() {
+  string uuid(kUUIDLength, '-');
   random_device dev;
   default_random_engine engine(dev());
   uniform_int_distribution<uint16_t> uniform_dist(0, UINT16_MAX);

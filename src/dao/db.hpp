@@ -17,12 +17,23 @@
 
 #include <sqlite3.h>
 
+#include <string>
+
 namespace waka::dao {
 
-// 初始化数据库
-void initDB();
-// 获取全局数据库实例
-sqlite3* getDB();
+// 数据库连接对象
+using DB = sqlite3*;
+
+// 打开DAO层访问的数据库
+// data_dir为waka-server存储数据的目录，该目录必须已经存在
+// 数据库的路径为${data_dir}/sqlite3.db
+// 返回数据库连接对象
+// 如果发生错误会抛出DBError异常
+[[nodiscard]] DB openDB(const std::string& data_dir);
+// 获取DAO层访问的数据库连接对象
+[[nodiscard]] DB getDB() noexcept;
+// 设置DAO层访问的数据库连接对象
+void setDB(DB db) noexcept;
 
 }  // namespace waka::dao
 

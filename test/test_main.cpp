@@ -12,17 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_COMMON_UUID_HPP_
-#define WAKA_SRC_COMMON_UUID_HPP_
+#include <gtest/gtest.h>
+#include <spdlog/spdlog.h>
 
-#include <string>
-
-namespace waka::common {
-
-// 生成一个vserion 4的UUID
-// 生成的UUID中字母为小写
-[[nodiscard]] std::string genUUIDv4();
-
-}  // namespace waka::common
-
-#endif  // WAKA_SRC_COMMON_UUID_HPP_
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  spdlog::set_level(spdlog::level::trace);
+  spdlog::flush_on(spdlog::level::trace);
+  spdlog::set_pattern("[%Y-%m-%d %T.%e] [%l] %t [%@] -- %v");
+  return RUN_ALL_TESTS();
+}
