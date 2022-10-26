@@ -12,23 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_EXCEPTION_CONFIG_ERROR_HPP_
-#define WAKA_SRC_EXCEPTION_CONFIG_ERROR_HPP_
+#include "meta_data.hpp"
 
-#include <fmt/core.h>
+using std::shared_ptr;
 
-#include "exception.hpp"
+namespace waka::common {
 
-namespace waka::exception {
+shared_ptr<MetaData> MetaData::instance_;
 
-// 无效的配置
-class ConfigError : public Exception {
- public:
-  ConfigError(const std::string& key, const std::string& value)
-      : Exception(
-            fmt::format("invalid config (key='{}', value='{}')", key, value)) {}
-};
-
-}  // namespace waka::exception
-
-#endif  // WAKA_SRC_EXCEPTION_CONFIG_ERROR_HPP_
+}  // namespace waka::common

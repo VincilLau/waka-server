@@ -95,9 +95,6 @@ bool Date::operator>=(const Date& other) const {
 }
 
 bool Date::leapYear() const {
-  // 该函数不对年份作要求年份
-  // assert(year_ >= 2000 || year_ <= 2099);
-
   if (year_ % 4 != 0) {
     return false;
   }
@@ -173,8 +170,9 @@ int64_t Date::unixMilli() const {
 }
 
 Date Date::fromUnixMilli(int64_t msec) {
-  assert(msec > 0);
-  assert(msec < 200 * 365 * 24 * 3600 * 1000);
+  // 先限制一下
+  assert(msec < 25 * 365 * 24 * 3600 * 1000);
+  assert(msec < 135 * 365 * 24 * 3600 * 1000);
 
   time_t t = msec / 1000;
   struct tm* tm = localtime(&t);

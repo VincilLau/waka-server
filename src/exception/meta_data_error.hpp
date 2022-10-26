@@ -12,30 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "config.hpp"
+#ifndef WAKA_SRC_EXCEPTION_META_DATA_ERROR_HPP_
+#define WAKA_SRC_EXCEPTION_META_DATA_ERROR_HPP_
 
-#include <assert.h>
+#include <fmt/core.h>
 
-#include <service/meta_service.hpp>
+#include "exception.hpp"
 
-using std::make_unique;
-using std::unique_ptr;
-using waka::service::MetaService;
+namespace waka::exception {
 
-namespace waka::common {
+// 无效的元数据
+class MetaDataError : public Exception {
+ public:
+  MetaDataError(const std::string& key, const std::string& value)
+      : Exception(
+            fmt::format("invalid config (key='{}', value='{}')", key, value)) {}
+};
 
-unique_ptr<Config> Config::config_;
+}  // namespace waka::exception
 
-// 在调用此函数前必须先调用initDB初始化数据库
-void Config::init() {
-  assert(!config_);
-  Config config = MetaService{}.loadConfig();
-  config_ = make_unique<Config>(std::move(config));
-}
-
-const Config& Config::get() {
-  assert(config_);
-  return *config_;
-}
-
-}  // namespace waka::common
+#endif  // WAKA_SRC_EXCEPTION_META_DATA_ERROR_HPP_

@@ -15,83 +15,25 @@
 #ifndef WAKA_SRC_COMMON_LOG_HPP_
 #define WAKA_SRC_COMMON_LOG_HPP_
 
-#include <spdlog/sinks/daily_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
-
-#include <common/config.hpp>
-#include <define.hpp>
-#include <filesystem>
 #include <string>
-
-#ifdef PLATFORM_LINUX
-// 导入isatty
-#include <unistd.h>
-#endif  // PLATFORM_LINUX
 
 namespace waka::common {
 
-inline static void initLogger() {
-  auto log_path = std::filesystem::path{WAKA_DATA_DIR} / "log" / "waka.log";
-  auto logger = spdlog::daily_logger_mt("waka_logger", log_path, 0, 0);
-  spdlog::set_default_logger(logger);
+// 初始化日志记录器，将进行以下操作
+// 1. 将日志输出到${date_dir}/log目录
+// 2. 日志按日期分割
+// 3. 暂时设置日志等级为trace
+// 4. 暂时设置每条日志都刷盘
+// 5. 修改日志格式
+// 6. 如果在Linux系统上且stdout为终端，将日志输出到stdout
+void initLogger(const std::string& data_dir);
 
-  spdlog::set_level(spdlog::level::trace);
-  spdlog::flush_on(spdlog::level::trace);
-  spdlog::set_pattern("[%Y-%m-%d %T.%e] [%l] %t [%@] -- %v");
-
-#ifdef PLATFORM_LINUX
-  if (isatty(STDOUT_FILENO)) {
-    auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    stdout_sink->set_pattern("[%Y-%m-%d %T.%e] [%^%l%$] %t [%@] -- %v");
-    logger->sinks().push_back(stdout_sink);
-  }
-#endif  // PLATFORM_LINUX
-}
-
-[[nodiscard]] inline static std::string logLevelToString(int level) {
-  switch (level) {
-    case spdlog::level::trace:
-      return "trace";
-    case spdlog::level::debug:
-      return "debug";
-    case spdlog::level::info:
-      return "info";
-    case spdlog::level::warn:
-      return "warn";
-    case spdlog::level::err:
-      return "error";
-    case spdlog::level::critical:
-      return "critical";
-    case spdlog::level::off:
-      return "off";
-  }
-  return "";
-}
-
-[[nodiscard]] inline static int stringToLogLevel(const std::string& str) {
-  if (str == "trace") {
-    return spdlog::level::trace;
-  } else if (str == "debug") {
-    return spdlog::level::debug;
-  } else if (str == "info") {
-    return spdlog::level::info;
-  } else if (str == "warn") {
-    return spdlog::level::warn;
-  } else if (str == "error") {
-    return spdlog::level::err;
-  } else if (str == "critical") {
-    return spdlog::level::critical;
-  } else if (str == "off") {
-    return spdlog::level::off;
-  }
-  return -1;
-}
-
-inline static void applyLogLevel() {
-  auto level = stringToLogLevel(Config::get().logLevel());
-  spdlog::set_level(static_cast<spdlog::level::level_enum>(level));
-}
+// 将日志级别从整数形式转换为字符串形式
+// 例如从2转换为info
+[[nodiscard]] std::string logLevelToStr(int level);
+// 将日志级别从字符串形式转换为整数形式
+// 例如从info转换为2
+[[nodiscard]] int strToLogLevel(const std::string& str);
 
 }  // namespace waka::common
 

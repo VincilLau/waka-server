@@ -24,6 +24,7 @@ namespace waka::common {
 // 计算时间戳时不考虑闰秒
 class Date {
  public:
+  // 允许构造不合法的Date，使用时需要调用valid()检查
   Date(int year, int month, int day) : year_(year), month_(month), day_(day) {}
 
   [[nodiscard]] int year() const { return year_; }

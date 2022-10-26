@@ -15,16 +15,19 @@
 #ifndef WAKA_SRC_SERVICE_META_SERVICE_HPP_
 #define WAKA_SRC_SERVICE_META_SERVICE_HPP_
 
-#include <common/config.hpp>
+#include <common/meta_data.hpp>
 #include <dao/meta_mapper.hpp>
 
 namespace waka::service {
 
 class MetaService {
  public:
-  void init() const;
-  [[nodiscard]] common::Config loadConfig() const;
-  void storeConfig(const common::Config& config) const;
+  // 从数据库中读取元数据
+  // 会对读取到的元数据进行检查，如果元数据不合法会抛出MetaDataError异常
+  [[nodiscard]] common::MetaData readMetaData() const;
+  // 向数据库写入元数据
+  // 写入前对元数据进行检查，如果元数据不合法会抛出MetaDataError异常
+  void writeMetaData(const common::MetaData& meta_data) const;
 
  private:
   dao::MetaMapper mapper_;

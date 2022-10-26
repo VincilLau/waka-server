@@ -57,18 +57,18 @@ class DB {
 
   // 获取全局数据库连接实例
   [[nodiscard]] static std::shared_ptr<DB> getInstance() noexcept {
-    assert(db_instance_ != nullptr);
-    return db_instance_;
+    assert(instance_ != nullptr);
+    return instance_;
   }
   // 设置全局数据库连接实例
   static void setInstance(std::shared_ptr<DB> db) noexcept {
-    assert(db_instance_ == nullptr);
-    db_instance_ = db;
+    assert(instance_ == nullptr);
+    instance_ = db;
   }
 
  private:
   // 全局数据库连接实例
-  static std::shared_ptr<DB> db_instance_;
+  static std::shared_ptr<DB> instance_;
 
   sqlite3* sqlite3_;
 };

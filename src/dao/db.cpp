@@ -32,7 +32,7 @@ using waka::exception::SQLError;
 
 namespace waka::dao {
 
-shared_ptr<DB> DB::db_instance_;
+shared_ptr<DB> DB::instance_;
 
 // 检查waka-server的数据目录是否满足以下条件
 // 1. 存在
