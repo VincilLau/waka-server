@@ -20,6 +20,7 @@
 #include <common/http.hpp>
 #include <common/pattern.hpp>
 #include <dto/summary/get.hpp>
+#include <exception/date_error.hpp>
 #include <service/heartbeat_service.hpp>
 
 #include "msg.hpp"

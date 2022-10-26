@@ -19,10 +19,12 @@
 
 namespace waka::exception {
 
-// 日期解析错误
+// 在以下情况可能抛出DateError异常
+// 1. 解析YYYY-MM-DD格式的日期出错
+// 2. 日期不合法
 class DateError : public Exception {
  public:
-  explicit DateError(std::string date_str) : Exception(std::move(date_str)) {}
+  explicit DateError(std::string reason) : Exception(std::move(reason)) {}
 };
 
 }  // namespace waka::exception

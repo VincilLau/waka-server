@@ -17,23 +17,61 @@
 
 #include <sqlite3.h>
 
+#include <cassert>
+#include <memory>
 #include <string>
 
 namespace waka::dao {
 
-// 数据库连接对象
-using DB = sqlite3*;
+// 表示一个SQLite3数据库连接
+class DB {
+ public:
+  // 处理数据库查询结果的回调函数
+  // 详见https://www.sqlite.org/c3ref/exec.html
+  using Callback = int (*)(void*, int, char**, char**);
 
-// 打开DAO层访问的数据库
-// data_dir为waka-server存储数据的目录，该目录必须已经存在
-// 数据库的路径为${data_dir}/sqlite3.db
-// 返回数据库连接对象
-// 如果发生错误会抛出DBError异常
-[[nodiscard]] DB openDB(const std::string& data_dir);
-// 获取DAO层访问的数据库连接对象
-[[nodiscard]] DB getDB() noexcept;
-// 设置DAO层访问的数据库连接对象
-void setDB(DB db) noexcept;
+  // 构造一个表示已关闭的数据库连接对象
+  DB() : sqlite3_(nullptr) {}
+  // 关闭数据库并销毁DB对象
+  ~DB() {
+    if (sqlite3_ != nullptr) {
+      close();
+    }
+  }
+
+  // 打开数据库，如果数据库不存在，则创建数据库并初始化meta表
+  // data_dir为waka-server存储数据的目录，该目录必须已经存在
+  // 数据库的路径为${data_dir}/sqlite3.db
+  // 如果发生错误会抛出DBError异常
+  void open(const std::string& data_dir);
+  // 关闭数据库连接
+  void close() {
+    assert(sqlite3_ != nullptr);
+    sqlite3_close(sqlite3_);
+  }
+  // 如果数据库已关闭，返回true；否则返回false
+  [[nodiscard]] bool closed() const { return sqlite3_ == nullptr; }
+
+  // 查询数据库，若出错则抛出SQLError
+  void query(const std::string& sql, Callback cb, void* arg) const;
+
+  // 获取全局数据库连接实例
+  [[nodiscard]] static std::shared_ptr<DB> getInstance() noexcept {
+    assert(db_instance_ != nullptr);
+    return db_instance_;
+  }
+  // 设置全局数据库连接实例
+  static void setInstance(std::shared_ptr<DB> db) noexcept {
+    assert(db_instance_ == nullptr);
+    db_instance_ = db;
+  }
+
+ private:
+  // 全局数据库连接实例
+  static std::shared_ptr<DB> db_instance_;
+
+  sqlite3* sqlite3_;
+};
 
 }  // namespace waka::dao
 

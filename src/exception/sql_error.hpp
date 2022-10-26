@@ -22,17 +22,10 @@
 namespace waka::exception {
 
 // 执行SQL时触发的异常
-class SqlError : public DBError {
+class SQLError : public DBError {
  public:
-  explicit SqlError(const std::string& reason, std::string sql)
-      : DBError(reason + " (" + sql + ")") {
-    sql_ = std::move(sql);
-  }
-
-  [[nodiscard]] const std::string& sql() const { return sql_; }
-
- private:
-  std::string sql_;  // 导致异常的sql语句
+  explicit SQLError(const std::string& reason, const std::string& sql)
+      : DBError(reason + " (" + sql + ")") {}
 };
 
 }  // namespace waka::exception

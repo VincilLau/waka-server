@@ -15,8 +15,6 @@
 #ifndef WAKA_SRC_DAO_META_MAPPER_HPP_
 #define WAKA_SRC_DAO_META_MAPPER_HPP_
 
-#include <sqlite3.h>
-
 #include <model/meta.hpp>
 #include <vector>
 
@@ -24,9 +22,10 @@
 
 namespace waka::dao {
 
+// 查询meta表的mapper
 class MetaMapper {
  public:
-  MetaMapper() : db_(getDB()) {}
+  MetaMapper() : db_(DB::getInstance()) {}
 
   // 创建meta表
   void createTable() const;
@@ -35,12 +34,12 @@ class MetaMapper {
   // 更新一条数据项
   void update(const model::Meta& meta) const;
   // 查找key对应的value
-  std::string get(const std::string& key) const;
-  // 列出所有项，按key的字典序排序
-  std::vector<model::Meta> listAll() const;
+  [[nodiscard]] std::string get(const std::string& key) const;
+  // 列出所有数据项，按key的字典序排序
+  [[nodiscard]] std::vector<model::Meta> listAll() const;
 
  private:
-  sqlite3* db_;
+  std::shared_ptr<DB> db_;
 };
 
 }  // namespace waka::dao

@@ -15,121 +15,88 @@
 #include "meta_mapper.hpp"
 
 #include <fmt/core.h>
-#include <sqlite3.h>
 
 #include <cassert>
-#include <exception/sql_error.hpp>
-#include <string>
+#include <define.hpp>
 
 using fmt::format;
 using std::string;
 using std::vector;
-using waka::exception::SqlError;
 using waka::model::Meta;
 
 namespace waka::dao {
 
-static const char* kCreateTableSql =
+static const char* kCreateTableSQL =
     "CREATE TABLE `meta` ("
     "`key` VERCHAR(255) PRIMARY KEY NOT NULL,"
     "`value` VERCHAR(255) NOT NULL"
     ")";
 
 void MetaMapper::createTable() const {
-  char* errmsg = nullptr;
-  int ret = sqlite3_exec(db_, kCreateTableSql, nullptr, nullptr, &errmsg);
-  if (ret) {
-    string reason{errmsg};
-    sqlite3_free(errmsg);
-    throw SqlError(std::move(reason), kCreateTableSql);
-  }
+  db_->query(kCreateTableSQL, nullptr, nullptr);
 }
 
-static const char* kInsertSql =
+static const char* kInsertSQL =
     "INSERT INTO `meta`"
     "(`key`, `value`) VALUES "
     "('{}', '{}')";
 
 void MetaMapper::insert(const Meta& meta) const {
-  string sql = format(kInsertSql, meta.key, meta.value);
-  char* errmsg = nullptr;
-  int ret = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &errmsg);
-  if (ret) {
-    string reason{errmsg};
-    sqlite3_free(errmsg);
-    throw SqlError(std::move(reason), std::move(sql));
-  }
+  string sql = format(kInsertSQL, meta.key, meta.value);
+  db_->query(sql, nullptr, nullptr);
 }
 
-static const char* kUpdateSql =
+static const char* kUpdateSQL =
     "UPDATE `meta` "
     "SET `value`='{}' "
     "WHERE `key`='{}'";
 
 void MetaMapper::update(const Meta& meta) const {
-  string sql = format(kUpdateSql, meta.value, meta.key);
-  char* errmsg = nullptr;
-  int ret = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &errmsg);
-  if (ret) {
-    string reason{errmsg};
-    sqlite3_free(errmsg);
-    throw SqlError(std::move(reason), std::move(sql));
-  }
+  string sql = format(kUpdateSQL, meta.value, meta.key);
+  db_->query(sql, nullptr, nullptr);
 }
 
-static const char* kGetSql =
+static const char* kGetSQL =
     "SELECT `value` "
     "FROM `meta` "
     "WHERE `key`='{}'";
 
-static int getCallback(void* value, int n, char** texts, char** names) {
-  assert(value);
+static int getCallback(void* value_str, int n, char** texts, char** names) {
+  assert(value_str != nullptr);
   assert(n == 1);
   assert(string{names[0]} == "value");
 
-  string* v = static_cast<string*>(value);
-  v->assign(texts[0]);
+  string* value = static_cast<string*>(value_str);
+  value->assign(texts[0]);
   return 0;
 }
 
 string MetaMapper::get(const string& key) const {
-  string sql = format(kGetSql, key);
+  string sql = format(kGetSQL, key);
   string value;
-  vector<Meta> metas;
-  char* errmsg = nullptr;
-  int ret = sqlite3_exec(db_, sql.c_str(), getCallback, &value, &errmsg);
-  if (ret) {
-    string reason{errmsg};
-    sqlite3_free(errmsg);
-    throw SqlError(std::move(reason), std::move(sql));
-  }
+  db_->query(sql, getCallback, &value);
   return value;
 }
 
-static const char* kListAllSql =
+static const char* kListAllSQL =
     "SELECT `key`, `value` FROM `meta` "
     "ORDER BY `key`";
 
-static int listAllCallback(void* metas, int n, char** texts, char** names) {
-  assert(metas);
+static int listAllCallback(void* metas_vector, int n, char** texts,
+                           char** names) {
+  assert(metas_vector != nullptr);
   assert(n == 2);
   assert(string{names[0]} == "key");
   assert(string{names[1]} == "value");
 
-  auto v = static_cast<vector<Meta>*>(metas);
-  v->push_back({texts[0], texts[1]});
+  auto metas = static_cast<vector<Meta>*>(metas_vector);
+  metas->push_back({texts[0], texts[1]});
   return 0;
 }
 
 vector<Meta> MetaMapper::listAll() const {
   vector<Meta> metas;
-  char* errmsg = nullptr;
-  int ret = sqlite3_exec(db_, kListAllSql, listAllCallback, &metas, &errmsg);
-  if (ret) {
-    string reason{errmsg};
-    sqlite3_free(errmsg);
-    throw SqlError(std::move(reason), kListAllSql);
-  }
+  db_->query(kListAllSQL, listAllCallback, &metas);
   return metas;
 }
 

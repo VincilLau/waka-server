@@ -15,8 +15,6 @@
 #ifndef WAKA_SRC_DAO_HEARTBEAT_MAPPER_HPP_
 #define WAKA_SRC_DAO_HEARTBEAT_MAPPER_HPP_
 
-#include <sqlite3.h>
-
 #include <common/date.hpp>
 #include <model/heartbeat.hpp>
 #include <set>
@@ -26,31 +24,33 @@
 
 namespace waka::dao {
 
+// 查询heartbeat表的mapper
+// heartbeat表按月分表，这对于HeartbeatMapper的使用者是透明的
 class HeartbeatMapper {
  public:
-  HeartbeatMapper() : db_(getDB()) {}
+  HeartbeatMapper() : db_(DB::getInstance()) {}
 
   // 查询数据库中所有的heartbeat表，存储到tables_中
-  void loadTables() const;
-
-  // 在数据库中插入一条心跳
-  // 该函数根据heartbeat的时间自动选择插入的表
+  // 在服务器启动时调用
+  void loadTableSet() const;
+  // 在表中插入一条心跳
   void insert(const model::Heartbeat& heartbeat) const;
-
   // 列出某一日期的所有心跳
   // 按时间从小到大排序
   [[nodiscard]] std::vector<model::Heartbeat> listByDate(
       const common::Date& date) const;
 
  private:
-  [[nodiscard]] bool hasTable(const std::string& name) const {
-    return tables_.find(name) != tables_.end();
-  }
+  // 创建表名为name的heartbeat表
   void createTable(const std::string& name) const;
+  // 判断是否存在表名为name的表
+  [[nodiscard]] bool hasTable(const std::string& name) const {
+    return table_set_.find(name) != table_set_.end();
+  }
+  // 所有heartbeat表，按表名字典序排序
+  static std::set<std::string> table_set_;
 
-  static std::set<std::string> tables_;
-
-  sqlite3* db_;
+  std::shared_ptr<DB> db_;
 };
 
 }  // namespace waka::dao

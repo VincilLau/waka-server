@@ -18,55 +18,72 @@
 #include <exception/sql_error.hpp>
 
 using fmt::format;
+using std::int64_t;
 using std::set;
 using std::string;
 using std::vector;
 using waka::common::Date;
-using waka::exception::SqlError;
+using waka::exception::SQLError;
 using waka::model::Heartbeat;
 
 namespace waka::dao {
 
-set<string> HeartbeatMapper::tables_;
+set<string> HeartbeatMapper::table_set_;
 
-static const char* kLoadTablesSql =
+static const char* kLoadTableSetSQL =
     "SELECT `name` FROM `sqlite_master` "
     "WHERE `type`='table' AND "
     "`name` LIKE 'heartbeat%'";
 
-static int loadTablesCallback(void* set, int n, char** texts, char** names) {
-  assert(set);
+static int loadTableListCallback(void* table_set, int n, char** texts,
+                                 char** names) {
+  assert(table_set);
   assert(n == 1);
   assert(string{names[0]} == "name");
 
-  auto tables = static_cast<std::set<string>*>(set);
+  auto tables = static_cast<std::set<string>*>(table_set);
   tables->insert(texts[0]);
   return 0;
 }
 
-void HeartbeatMapper::loadTables() const {
-  char* errmsg = nullptr;
-  int ret =
-      sqlite3_exec(db_, kLoadTablesSql, loadTablesCallback, &tables_, &errmsg);
-  if (ret) {
-    string reason{errmsg};
-    sqlite3_free(errmsg);
-    throw SqlError(std::move(reason), kLoadTablesSql);
-  }
+void HeartbeatMapper::loadTableSet() const {
+  db_->query(kLoadTableSetSQL, loadTableListCallback, &table_set_);
 }
 
-static const char* kInsertSql =
+static const char* kCreateTableSQL =
+    "CREATE TABLE `{}` ("
+    "`branch`   VARCHAR(255)             NOT NULL,"
+    "`editor`   VARCHAR(255)             NOT NULL,"
+    "`entity`   TEXT                     NOT NULL,"
+    "`id`       CHAR(36)     PRIMARY KEY NOT NULL,"
+    "`language` VARCHAR(255)             NOT NULL,"
+    "`os`       VARCHAR(255)             NOT NULL,"
+    "`project`  VARCHAR(255)             NOT NULL,"
+    "`time`     BIGINT                   NOT NULL"
+    ")";
+
+static const char* kCreateIndexSQL =
+    "CREATE INDEX `time_index` "
+    "ON `{}` (`time`);";
+
+void HeartbeatMapper::createTable(const string& name) const {
+  string sql = format(kCreateTableSQL, name);
+  db_->query(sql, nullptr, nullptr);
+
+  sql = format(kCreateIndexSQL, name);
+  db_->query(sql, nullptr, nullptr);
+}
+
+static const char* kInsertSQL =
     "INSERT INTO `{}` ("
-    "branch,"
-    "category,"
-    "editor,"
-    "entity,"
-    "id,"
-    "language,"
-    "os,"
-    "project,"
-    "time,"
-    "type"
+    "`branch`,"
+    "`editor`,"
+    "`entity`,"
+    "`id`,"
+    "`language`,"
+    "`os`,"
+    "`project`,"
+    "`time`"
     ") VALUES ("
     "'{}',"
     "'{}',"
@@ -75,20 +92,19 @@ static const char* kInsertSql =
     "'{}',"
     "'{}',"
     "'{}',"
-    "'{}',"
-    "{},"
-    "'{}'"
+    "{}"
     ")";
 
 void HeartbeatMapper::insert(const Heartbeat& heartbeat) const {
-  Date date = Date::fromUnixMilli(heartbeat.time);
+  int64_t unix_milli = static_cast<int64_t>(heartbeat.time * 1000);
+  Date date = Date::fromUnixMilli(unix_milli);
   string table = format("heartbeat_{:04d}_{:02d}", date.year(), date.month());
   if (!hasTable(table)) {
     createTable(table);
-    tables_.insert(table);
+    table_set_.insert(table);
   }
 
-  string sql = format(kInsertSql, table,
+  string sql = format(kInsertSQL, table,
                       heartbeat.branch,    //
                       heartbeat.editor,    //
                       heartbeat.entity,    //
@@ -98,93 +114,47 @@ void HeartbeatMapper::insert(const Heartbeat& heartbeat) const {
                       heartbeat.project,   //
                       heartbeat.time       //
   );
-  char* errmsg = nullptr;
-  int ret = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &errmsg);
-  if (ret) {
-    string reason{errmsg};
-    sqlite3_free(errmsg);
-    throw SqlError(std::move(reason), std::move(sql));
-  }
+  db_->query(sql, nullptr, nullptr);
 }
 
-static const char* kCreateTableSql =
-    "CREATE TABLE `{}` ("
-    "`branch`   VARCHAR(255) NOT NULL,"
-    "`category` VARCHAR(255) NOT NULL,"
-    "`editor`   VARCHAR(255) NOT NULL,"
-    "`entity`   TEXT         NOT NULL,"
-    "`id`       CHAR(36)     NOT NULL,"
-    "`language` VARCHAR(255) NOT NULL,"
-    "`os`       VARCHAR(255) NOT NULL,"
-    "`project`  VARCHAR(255) NOT NULL,"
-    "`time`     BIGINT       NOT NULL,"
-    "`type`     VARCHAR(255) NOT NULL"
-    ")";
-
-static const char* kCreateIndexSql =
-    "CREATE INDEX `time_index` "
-    "ON `{}` (`time`);";
-
-void HeartbeatMapper::createTable(const string& name) const {
-  string sql = format(kCreateTableSql, name);
-  char* errmsg = nullptr;
-  int ret = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &errmsg);
-  if (ret) {
-    string reason{errmsg};
-    sqlite3_free(errmsg);
-    throw SqlError(std::move(reason), std::move(sql));
-  }
-
-  sql = format(kCreateIndexSql, name);
-  ret = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &errmsg);
-  if (ret) {
-    string reason{errmsg};
-    sqlite3_free(errmsg);
-    throw SqlError(std::move(reason), std::move(sql));
-  }
-}
-
-static const char* kListByDateSql =
+static const char* kListByDateSQL =
     "SELECT "
     "`branch`,"
-    "`category`,"
     "`editor`,"
     "`entity`,"
     "`id`,"
     "`language`,"
     "`os`,"
     "`project`,"
-    "`time`,"
-    "`type`"
+    "`time`"
     " FROM `{}` "
     "WHERE `time` >= {} "
     "AND `time` < {} "
     "ORDER BY `time`";
 
-static int listByDateCallback(void* v, int n, char** texts, char** names) {
-  assert(v);
-  assert(n == 10);
+static int listByDateCallback(void* lst_vector, int n, char** texts,
+                              char** names) {
+  assert(lst_vector);
+  assert(n == 8);
   assert(string{names[0]} == "branch");
-  assert(string{names[1]} == "category");
-  assert(string{names[2]} == "editor");
-  assert(string{names[3]} == "entity");
-  assert(string{names[4]} == "id");
-  assert(string{names[5]} == "language");
-  assert(string{names[6]} == "os");
-  assert(string{names[7]} == "project");
-  assert(string{names[8]} == "time");
-  assert(string{names[9]} == "type");
+  assert(string{names[1]} == "editor");
+  assert(string{names[2]} == "entity");
+  assert(string{names[3]} == "id");
+  assert(string{names[4]} == "language");
+  assert(string{names[5]} == "os");
+  assert(string{names[6]} == "project");
+  assert(string{names[7]} == "time");
 
-  auto lst = static_cast<vector<Heartbeat>*>(v);
+  auto lst = static_cast<vector<Heartbeat>*>(lst_vector);
   Heartbeat h;
   h.branch = texts[0];
-  h.editor = texts[2];
-  h.entity = texts[3];
-  h.id = texts[4];
-  h.language = texts[5];
-  h.os = texts[6];
-  h.project = texts[7];
-  h.time = atoll(texts[8]);
+  h.editor = texts[1];
+  h.entity = texts[2];
+  h.id = texts[3];
+  h.language = texts[4];
+  h.os = texts[5];
+  h.project = texts[6];
+  h.time = atoll(texts[7]);
   lst->push_back(std::move(h));
 
   return 0;
@@ -201,19 +171,12 @@ vector<Heartbeat> HeartbeatMapper::listByDate(const Date& date) const {
     return {};
   }
 
-  Date tomorrow = date;
-  tomorrow++;
+  Date next_day = date;
+  next_day++;
   string sql =
-      format(kListByDateSql, table, date.unixMilli(), tomorrow.unixMilli());
+      format(kListByDateSQL, table, date.unixMilli(), next_day.unixMilli());
   vector<Heartbeat> lst;
-
-  char* errmsg = nullptr;
-  int ret = sqlite3_exec(db_, sql.c_str(), listByDateCallback, &lst, &errmsg);
-  if (ret) {
-    string reason{errmsg};
-    sqlite3_free(errmsg);
-    throw SqlError(std::move(reason), std::move(sql));
-  }
+  db_->query(sql, listByDateCallback, &lst);
   return lst;
 }
 

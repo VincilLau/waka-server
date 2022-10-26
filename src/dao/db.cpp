@@ -17,33 +17,22 @@
 #include <fmt/core.h>
 
 #include <cassert>
-#include <exception/db_error.hpp>
+#include <exception/sql_error.hpp>
 #include <filesystem>
 
 using fmt::format;
+using std::shared_ptr;
 using std::string;
 using std::filesystem::exists;
 using std::filesystem::is_directory;
 using std::filesystem::perms;
 using std::filesystem::status;
 using waka::exception::DBError;
+using waka::exception::SQLError;
 
 namespace waka::dao {
 
-// DAO层访问的数据库连接对象
-// 在使用mapper前必须调用setDB将此变量设置为有效的数据库连接对象
-static DB daoDB = nullptr;
-
-DB getDB() noexcept {
-  assert(daoDB != nullptr);
-  return daoDB;
-}
-
-void setDB(DB db) noexcept {
-  assert(db != nullptr);
-  assert(daoDB == nullptr);
-  daoDB = db;
-}
+shared_ptr<DB> DB::db_instance_;
 
 // 检查waka-server的数据目录是否满足以下条件
 // 1. 存在
@@ -70,7 +59,8 @@ void setDB(DB db) noexcept {
   }
 }
 
-DB openDB(const std::string& data_dir) {
+void DB::open(const string& data_dir) {
+  assert(sqlite3_ == nullptr);
   assert(!data_dir.empty());
 
   string what = checkDataDir(data_dir);
@@ -79,14 +69,25 @@ DB openDB(const std::string& data_dir) {
   }
 
   string db_path = data_dir + "/sqlite3.db";
-  DB db = nullptr;
-  int ret = sqlite3_open(db_path.c_str(), &db);
+  int ret = sqlite3_open(db_path.c_str(), &sqlite3_);
   if (ret) {
     string what =
         format("can't open or create sqlite3 database on {}", db_path);
     throw DBError(std::move(what));
   }
-  return db;
+}
+
+void DB::query(const string& sql, Callback cb, void* arg) const {
+  assert(sqlite3_ != nullptr);
+  assert(!(cb == nullptr) ^ (arg == nullptr));
+
+  char* errmsg = nullptr;
+  int ret = sqlite3_exec(sqlite3_, sql.c_str(), nullptr, nullptr, &errmsg);
+  if (ret) {
+    string reason{errmsg};
+    sqlite3_free(errmsg);
+    throw SQLError(reason, sql);
+  }
 }
 
 }  // namespace waka::dao
