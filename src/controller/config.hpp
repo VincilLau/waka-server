@@ -17,7 +17,7 @@
 
 #include <dto/config/put.hpp>
 #include <http/http.hpp>
-#include <service/meta_service.hpp>
+#include <service/meta.hpp>
 
 namespace waka::controller {
 

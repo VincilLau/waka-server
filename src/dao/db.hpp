@@ -39,7 +39,7 @@ class DB {
     }
   }
 
-  // 打开数据库，如果数据库不存在，则创建数据库并初始化meta表
+  // 打开数据库，如果数据库不存在，则创建数据库
   // data_dir为waka-server存储数据的目录，该目录必须已经存在
   // 数据库的路径为${data_dir}/sqlite3.db
   // 如果发生错误会抛出DBError异常
@@ -65,6 +65,9 @@ class DB {
     assert(instance_ == nullptr);
     instance_ = db;
   }
+
+  // 检查数据库是否存在
+  [[nodiscard]] static bool exists(const std::string& data_dir);
 
  private:
   // 全局数据库连接实例

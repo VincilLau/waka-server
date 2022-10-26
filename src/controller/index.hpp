@@ -12,18 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_EXCEPTION_HTTP_ERROR_HPP_
-#define WAKA_SRC_EXCEPTION_HTTP_ERROR_HPP_
+#ifndef WAKA_SRC_CONTROLLER_INDEX_HPP_
+#define WAKA_SRC_CONTROLLER_INDEX_HPP_
 
-#include "exception.hpp"
+#include <http/http.hpp>
 
-namespace waka::exception {
+namespace waka::controller {
 
-class HTTPError : public Exception {
+class IndexController {
  public:
-  explicit HTTPError(std::string reason) : Exception(std::move(reason)) {}
+  // GET /
+  void get(const http::Request& rep, http::Response& resp) {
+    resp.setRedirect("/dashboard");
+  }
 };
 
-}  // namespace waka::exception
+}  // namespace waka::controller
 
-#endif  // WAKA_SRC_EXCEPTION_HTTP_ERROR_HPP_
+#endif  // WAKA_SRC_CONTROLLER_INDEX_HPP_

@@ -17,12 +17,13 @@
 
 #include <common/date.hpp>
 #include <http/http.hpp>
-#include <service/heartbeat_service.hpp>
+#include <service/heartbeat.hpp>
 
 namespace waka::controller {
 
 class SummaryController {
  public:
+  // GET /api/summary
   void get(const http::Request& req, http::Response& resp);
 
  private:

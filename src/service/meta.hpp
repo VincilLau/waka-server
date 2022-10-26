@@ -16,12 +16,14 @@
 #define WAKA_SRC_SERVICE_META_SERVICE_HPP_
 
 #include <common/meta_data.hpp>
-#include <dao/meta_mapper.hpp>
+#include <dao/meta.hpp>
 
 namespace waka::service {
 
 class MetaService {
  public:
+  // 初始化meta表
+  void init() const;
   // 从数据库中读取元数据
   // 会对读取到的元数据进行检查，如果元数据不合法会抛出MetaDataError异常
   [[nodiscard]] common::MetaData readMetaData() const;

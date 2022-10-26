@@ -30,13 +30,13 @@ struct Heartbeat {
 
   std::shared_ptr<std::string> branch;
   std::shared_ptr<std::string> category;
-  std::shared_ptr<int> cursorpos;
+  std::shared_ptr<std::int64_t> cursorpos;
   std::shared_ptr<std::vector<std::string>> dependencies;
   std::shared_ptr<std::string> entity;
   std::shared_ptr<bool> is_write;
   std::shared_ptr<std::string> language;
-  std::shared_ptr<int> lineno;
-  std::shared_ptr<int> lines;
+  std::shared_ptr<std::int64_t> lineno;
+  std::shared_ptr<std::int64_t> lines;
   std::shared_ptr<std::string> project;
   std::shared_ptr<double> time;
   std::shared_ptr<std::string> type;

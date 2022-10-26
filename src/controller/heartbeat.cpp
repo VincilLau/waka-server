@@ -16,7 +16,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "msg.hpp"
+#include <http/msg.hpp>
 
 using fmt::format;
 using std::size_t;
@@ -25,6 +25,7 @@ using waka::dto::heartbeat::post::Heartbeat;
 using waka::dto::heartbeat::post::Param;
 using waka::dto::heartbeat::post::Result;
 using waka::exception::JSONError;
+using waka::http::jsonMsg;
 using waka::http::Request;
 using waka::http::Response;
 using waka::http::Status;
@@ -78,9 +79,9 @@ bo::Heartbeat HeartbeatController::dtoToBO(const Heartbeat& dto) {
 void HeartbeatController::post(const Request& req, Response& resp) {
   SPDLOG_DEBUG("POST /api/users/current/heartbeats.bulk");
 
-  string mime_type = req.getParam("Content-Type");
+  string mime_type = req.getHeader("Content-Type");
   if (mime_type != "application/json") {
-    string msg = format("unexpected mime type {}", mime_type);
+    string msg = format("unexpected mime type '{}'", mime_type);
     SPDLOG_WARN("PUT /api/config -- {}", msg);
     resp.setStatus(Status::kBadRequest);
     resp.setContent(jsonMsg(msg), "application/json");

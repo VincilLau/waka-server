@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "heartbeat_mapper.hpp"
+#include "heartbeat.hpp"
 
 #include <common/date.hpp>
 #include <exception/sql_error.hpp>
@@ -23,7 +23,6 @@ using std::set;
 using std::string;
 using std::vector;
 using waka::common::Date;
-using waka::exception::SQLError;
 using waka::model::Heartbeat;
 
 namespace waka::dao {
@@ -96,8 +95,7 @@ static const char* kInsertSQL =
     ")";
 
 void HeartbeatMapper::insert(const Heartbeat& heartbeat) const {
-  int64_t unix_milli = static_cast<int64_t>(heartbeat.time * 1000);
-  Date date = Date::fromUnixMilli(unix_milli);
+  Date date = Date::fromUnixMilli(heartbeat.time);
   string table = format("heartbeat_{:04d}_{:02d}", date.year(), date.month());
   if (!hasTable(table)) {
     createTable(table);

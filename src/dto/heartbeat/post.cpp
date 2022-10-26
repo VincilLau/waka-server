@@ -16,6 +16,7 @@
 
 using fmt::format;
 using nlohmann::json;
+using std::int64_t;
 using std::make_shared;
 using std::size_t;
 using std::string;
@@ -48,14 +49,17 @@ static const char* typeName(json::value_t type) {
   }
 }
 
-static void checkType(const json& j, json::value_t type, const string& field) {
+// 如果是null,返回false；否则返回true
+[[nodiscard]] static bool checkType(const json& j, json::value_t type,
+                                    const string& field) {
   if (j.is_null()) {
-    return;
+    return false;
   }
   if (j.type() != type) {
     throw JSONError(format("{} must be a {}, not {}", field, typeName(type),
                            j.type_name()));
   }
+  return true;
 }
 
 static Heartbeat heartbeatFromJSON(const json& j, size_t index) {
@@ -73,42 +77,66 @@ static Heartbeat heartbeatFromJSON(const json& j, size_t index) {
   const auto& time = j["time"];
   const auto& user_agent = j["user_agent"];
 
-  checkType(branch, json::value_t::string, format("[{}]branch", index));
-  checkType(category, json::value_t::string, format("[{}]category", index));
-  checkType(cursorpos, json::value_t::number_integer,
-            format("[{}]cursorpos", index));
-  checkType(dependencies, json::value_t::array,
-            format("[{}]dependencies", index));
-  checkType(entity, json::value_t::string, format("[{}]entity", index));
-  checkType(type, json::value_t::string, format("[{}]type", index));
-  checkType(is_write, json::value_t::boolean, format("[{}]is_write", index));
-  checkType(language, json::value_t::string, format("[{}]language", index));
-  checkType(lineno, json::value_t::number_integer, format("[{}]lineno", index));
-  checkType(lines, json::value_t::number_integer, format("[{}]lines", index));
-  checkType(project, json::value_t::string, format("[{}]project", index));
-  checkType(time, json::value_t::number_float, format("[{}]time", index));
-  checkType(user_agent, json::value_t::string, format("[{}]user_agent", index));
+  Heartbeat h;
+  if (checkType(branch, json::value_t::string, format("[{}]branch", index))) {
+    h.branch = make_shared<string>(branch);
+  }
+  if (checkType(category, json::value_t::string,
+                format("[{}]category", index))) {
+    h.category = make_shared<string>(category);
+  }
+  if (checkType(cursorpos, json::value_t::number_unsigned,
+                format("[{}]cursorpos", index))) {
+    h.cursorpos = make_shared<int64_t>(cursorpos);
+  }
+  if (checkType(dependencies, json::value_t::array,
+                format("[{}]dependencies", index))) {
+  }
+  if (checkType(entity, json::value_t::string, format("[{}]entity", index))) {
+    h.entity = make_shared<string>(entity);
+  }
+  if (checkType(type, json::value_t::string, format("[{}]type", index))) {
+    h.type = make_shared<string>(type);
+  }
+  if (checkType(is_write, json::value_t::boolean,
+                format("[{}]is_write", index))) {
+    h.is_write = make_shared<bool>(is_write);
+  }
+  if (checkType(language, json::value_t::string,
+                format("[{}]language", index))) {
+    h.language = make_shared<string>(language);
+  }
+  if (checkType(lineno, json::value_t::number_unsigned,
+                format("[{}]lineno", index))) {
+    h.lineno = make_shared<int64_t>(lineno);
+  }
+  if (checkType(lines, json::value_t::number_unsigned,
+                format("[{}]lines", index))) {
+    h.lines = make_shared<int64_t>(lines);
+  }
+  if (checkType(project, json::value_t::string, format("[{}]project", index))) {
+    h.project = make_shared<string>(project);
+  }
+  if (checkType(time, json::value_t::number_float, format("[{}]time", index))) {
+    h.time = make_shared<double>(time);
+  }
+  if (checkType(user_agent, json::value_t::string,
+                format("[{}]user_agent", index))) {
+    h.user_agent = make_shared<string>(user_agent);
+  }
 
   for (size_t i = 0; i < dependencies.size(); i++) {
     const auto& d = dependencies[i];
-    checkType(d, json::value_t::string,
-              format("[{}]dependencies[{}]", index, i));
+    bool ok = checkType(d, json::value_t::string,
+                        format("[{}]dependencies[{}]", index, i));
+    if (!ok) {
+      string msg = format("[{}].dependencies[{}] can't be null", index, i);
+      throw JSONError(msg);
+    }
   }
 
-  Heartbeat h;
-  h.branch = make_shared<string>(branch);
-  h.category = make_shared<string>(category);
-  h.cursorpos = make_shared<int>(cursorpos);
   h.dependencies = make_shared<vector<string>>(dependencies);
-  h.entity = make_shared<string>(entity);
-  h.type = make_shared<string>(type);
-  h.is_write = make_shared<bool>(is_write);
-  h.language = make_shared<string>(language);
-  h.lineno = make_shared<int>(lineno);
-  h.lines = make_shared<int>(lines);
-  h.project = make_shared<string>(project);
-  h.time = make_shared<double>(time);
-  h.user_agent = make_shared<string>(user_agent);
+
   return h;
 }
 

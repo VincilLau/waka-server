@@ -55,10 +55,12 @@ target("waka-server_static")
     set_configvar("WAKA_PROJECT_DIR", "$(projectdir)")
     add_configfiles("src/define.hpp.in")
 
-    add_files("src/common/*.cpp")
-    add_files("src/controller/*.cpp")
-    add_files("src/dao/*.cpp")
-    add_files("src/service/*.cpp")
+    add_files("src/common/**.cpp")
+    add_files("src/controller/**.cpp")
+    add_files("src/dao/**.cpp")
+    add_files("src/dto/**.cpp")
+    add_files("src/http/**.cpp")
+    add_files("src/service/**.cpp")
 
     add_includedirs("src")
 

@@ -12,21 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_EXCEPTION_DB_ERROR_HPP_
-#define WAKA_SRC_EXCEPTION_DB_ERROR_HPP_
+#ifndef WAKA_SRC_HTTP_MSG_HPP_
+#define WAKA_SRC_HTTP_MSG_HPP_
 
-#include <string>
+#include <nlohmann/json.hpp>
 
-#include "exception.hpp"
+namespace waka::http {
 
-namespace waka::exception {
+[[nodiscard]] inline static std::string jsonMsg(std::string msg) {
+  return nlohmann::json{{"message", std::move(msg)}}.dump();
+}
 
-// 操作数据库时触发的异常
-class DBError : public Exception {
- public:
-  explicit DBError(std::string reason) : Exception(std::move(reason)) {}
-};
+}  // namespace waka::http
 
-}  // namespace waka::exception
-
-#endif  // WAKA_SRC_EXCEPTION_DB_ERROR_HPP_
+#endif  // WAKA_SRC_HTTP_MSG_HPP_

@@ -16,7 +16,7 @@
 #define WAKA_SRC_CONTROLLER_STATUS_BAR_HPP_
 
 #include <http/http.hpp>
-#include <service/heartbeat_service.hpp>
+#include <service/heartbeat.hpp>
 
 namespace waka::controller {
 

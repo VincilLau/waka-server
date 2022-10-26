@@ -171,8 +171,8 @@ int64_t Date::unixMilli() const {
 
 Date Date::fromUnixMilli(int64_t msec) {
   // 先限制一下
-  assert(msec < 25 * 365 * 24 * 3600 * 1000);
-  assert(msec < 135 * 365 * 24 * 3600 * 1000);
+  assert(msec > 25LL * 365LL * 24LL * 3600LL * 1000LL);
+  assert(msec < 135LL * 365LL * 24LL * 3600LL * 1000LL);
 
   time_t t = msec / 1000;
   struct tm* tm = localtime(&t);

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "heartbeat_service.hpp"
+#include "heartbeat.hpp"
 
 #include <common/pattern.hpp>
 #include <common/uuid.hpp>

@@ -18,7 +18,7 @@
 #include <bo/heartbeat.hpp>
 #include <dto/heartbeat/post.hpp>
 #include <http/http.hpp>
-#include <service/heartbeat_service.hpp>
+#include <service/heartbeat.hpp>
 
 namespace waka::controller {
 

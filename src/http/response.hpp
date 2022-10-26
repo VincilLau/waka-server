@@ -28,6 +28,7 @@ class Response {
   virtual void setStatus(Status status) = 0;
   virtual void addHeader(const char* key, const char* value) = 0;
   virtual void setContent(const std::string& data, const char* mime_type) = 0;
+  virtual void setRedirect(const char* url) = 0;
 };
 
 class HTTPLibResponse : public Response {
@@ -41,6 +42,7 @@ class HTTPLibResponse : public Response {
   void setContent(const std::string& data, const char* mime_type) override {
     resp_.set_content(data, mime_type);
   }
+  void setRedirect(const char* url) override { resp_.set_redirect(url); }
 
  private:
   httplib::Response& resp_;

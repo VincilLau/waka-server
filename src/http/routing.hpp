@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_CONTROLLER_MSG_HPP_
-#define WAKA_SRC_CONTROLLER_MSG_HPP_
+#ifndef WAKA_SRC_HTTP_ROUTING_HPP_
+#define WAKA_SRC_HTTP_ROUTING_HPP_
 
-#include <nlohmann/json.hpp>
+#include "wrapper.hpp"
 
-namespace waka::controller {
+namespace waka::http {
 
-[[nodiscard]] inline static std::string jsonMsg(std::string msg) {
-  return nlohmann::json{{"message", std::move(msg)}}.dump();
-}
+void setupRouting(httplib::Server& server);
 
-}  // namespace waka::controller
+}  // namespace waka::http
 
-#endif  // WAKA_SRC_CONTROLLER_MSG_HPP_
+#endif  // WAKA_SRC_HTTP_ROUTING_HPP_

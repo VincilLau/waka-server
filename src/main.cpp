@@ -12,47 +12,55 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <httplib.h>
-#include <spdlog/spdlog.h>
-
-#include <common/config.hpp>
 #include <common/log.hpp>
-#include <controller/routing.hpp>
-#include <dao/db.hpp>
-#include <stdexcept>
+#include <dao/heartbeat.hpp>
+#include <http/routing.hpp>
+#include <service/meta.hpp>
 
 using httplib::Server;
-using std::exception;
-using waka::common::applyLogLevel;
-using waka::common::Config;
+using std::make_shared;
 using waka::common::initLogger;
-using waka::controller::setupRouting;
+using waka::common::MetaData;
+using waka::common::strToLogLevel;
+using waka::dao::DB;
+using waka::dao::HeartbeatMapper;
+using waka::http::setupRouting;
+using waka::service::MetaService;
 
 static void init() {
-  initLogger();
-  // 打开数据库
-  // 如果数据库不存在则创建数据库并初始化meta表
-  // 加载数据库中的heartbeat表
-  // initDB();
-  // 从meta表中读取配置
-  Config::init();
-  // 根据配置设置日志级别
-  applyLogLevel();
+  initLogger(WAKA_DATA_DIR);
+
+  bool exists = DB::exists(WAKA_DATA_DIR);
+  auto db = make_shared<DB>();
+  db->open(WAKA_DATA_DIR);
+  DB::setInstance(db);
+
+  MetaService meta_service;
+  if (!exists) {
+    meta_service.init();
+  }
+  auto meta_data = make_shared<MetaData>(meta_service.readMetaData());
+  MetaData::setInstance(meta_data);
+
+  int level = strToLogLevel(meta_data->log_level);
+  spdlog::set_level(static_cast<spdlog::level::level_enum>(level));
+
+  HeartbeatMapper{}.loadTableSet();
 }
 
 static void runServer() {
   Server server;
   setupRouting(server);
-  const Config& config = Config::get();
-  SPDLOG_INFO("listen on {}:{}", config.ip(), config.port());
-  server.listen(config.ip().c_str(), config.port());
+  auto meta_data = MetaData::getInstance();
+  SPDLOG_INFO("listen on {}:{}", meta_data->ip, meta_data->port);
+  server.listen(meta_data->ip.c_str(), meta_data->port);
 }
 
 int main() {
   try {
     init();
     runServer();
-  } catch (const exception& e) {
+  } catch (const std::exception& e) {
     SPDLOG_CRITICAL("{}", e.what());
     return 1;
   }

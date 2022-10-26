@@ -18,7 +18,7 @@
 #include <bo/heartbeat.hpp>
 #include <bo/summary.hpp>
 #include <common/date.hpp>
-#include <dao/heartbeat_mapper.hpp>
+#include <dao/heartbeat.hpp>
 
 namespace waka::service {
 

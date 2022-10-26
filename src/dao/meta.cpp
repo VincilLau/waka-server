@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "meta_mapper.hpp"
+#include "meta.hpp"
 
 #include <fmt/core.h>
 

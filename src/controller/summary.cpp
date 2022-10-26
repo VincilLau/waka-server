@@ -19,8 +19,7 @@
 #include <common/pattern.hpp>
 #include <dto/summary/get.hpp>
 #include <exception/date_error.hpp>
-
-#include "msg.hpp"
+#include <http/msg.hpp>
 
 using fmt::format;
 using std::int64_t;
@@ -31,6 +30,7 @@ using waka::common::formatTime;
 using waka::dto::summary::get::Item;
 using waka::dto::summary::get::Result;
 using waka::exception::DateError;
+using waka::http::jsonMsg;
 using waka::http::Request;
 using waka::http::Response;
 using waka::http::Status;

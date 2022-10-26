@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef WAKA_SRC_CONTROLLER_CONFIG_CPP_
+#define WAKA_SRC_CONTROLLER_CONFIG_CPP_
+
 #include "config.hpp"
 
 #include <spdlog/spdlog.h>
@@ -19,8 +22,7 @@
 #include <dto/config/get.hpp>
 #include <exception/json_error.hpp>
 #include <exception/meta_data_error.hpp>
-
-#include "msg.hpp"
+#include <http/msg.hpp>
 
 using fmt::format;
 using std::string;
@@ -29,6 +31,7 @@ using waka::dto::config::get::Result;
 using waka::dto::config::put::Param;
 using waka::exception::JSONError;
 using waka::exception::MetaDataError;
+using waka::http::jsonMsg;
 using waka::http::Request;
 using waka::http::Response;
 using waka::http::Status;
@@ -54,7 +57,7 @@ void ConfigController::get(const Request& req, Response& resp) {
 void ConfigController::put(const Request& req, Response& resp) {
   SPDLOG_DEBUG("PUT /api/config");
 
-  string mime_type = req.getParam("Content-Type");
+  string mime_type = req.getHeader("Content-Type");
   if (mime_type != "application/json") {
     string msg = format("unexpected mime type {}", mime_type);
     SPDLOG_WARN("PUT /api/config -- {}", msg);
@@ -95,3 +98,5 @@ void ConfigController::put(const Request& req, Response& resp) {
 }
 
 }  // namespace waka::controller
+
+#endif  // WAKA_SRC_CONTROLLER_CONFIG_CPP_

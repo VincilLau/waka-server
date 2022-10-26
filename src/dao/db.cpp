@@ -15,6 +15,7 @@
 #include "db.hpp"
 
 #include <fmt/core.h>
+#include <spdlog/spdlog.h>
 
 #include <cassert>
 #include <exception/sql_error.hpp>
@@ -81,13 +82,22 @@ void DB::query(const string& sql, Callback cb, void* arg) const {
   assert(sqlite3_ != nullptr);
   assert(!(cb == nullptr) ^ (arg == nullptr));
 
+  SPDLOG_DEBUG("DB:query sql='{}'", sql);
+
   char* errmsg = nullptr;
-  int ret = sqlite3_exec(sqlite3_, sql.c_str(), nullptr, nullptr, &errmsg);
+  int ret = sqlite3_exec(sqlite3_, sql.c_str(), cb, arg, &errmsg);
   if (ret) {
     string reason{errmsg};
     sqlite3_free(errmsg);
     throw SQLError(reason, sql);
   }
+}
+
+bool DB::exists(const string& data_dir) {
+  assert(!data_dir.empty());
+
+  string db_path = data_dir + "/sqlite3.db";
+  return std::filesystem::exists(db_path);
 }
 
 }  // namespace waka::dao

@@ -101,7 +101,7 @@ inline nlohmann::json Result::toJSON() const {
       {"total", total.toJSON()},          //
       {"days", std::move(days_json)},     //
   };
-  return j.dump();
+  return j;
 }
 
 }  // namespace waka::dto::summary::get

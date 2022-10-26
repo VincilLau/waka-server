@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "meta_service.hpp"
+#include "meta.hpp"
 
 #include <common/date.hpp>
 #include <common/log.hpp>
@@ -32,15 +32,25 @@ using waka::exception::MetaDataError;
 
 namespace waka::service {
 
+void MetaService::init() const {
+  mapper_.createTable();
+  MetaData meta_data;
+  mapper_.insert({"create_date", meta_data.create_date.toString()});
+  mapper_.insert({"ip", meta_data.ip});
+  mapper_.insert({"log_level", meta_data.log_level});
+  mapper_.insert({"port", to_string(meta_data.port)});
+  mapper_.insert({"time_format", meta_data.time_format});
+  mapper_.insert({"timeout", to_string(meta_data.timeout)});
+  mapper_.insert({"version", WAKA_VERSION});
+}
+
 MetaData MetaService::readMetaData() const {
   MetaData meta_data;
   string create_date_value = mapper_.get("create_date");
   try {
     meta_data.create_date = Date::parse(create_date_value);
   } catch (const DateError& e) {
-    if (!isValidIP(meta_data.ip)) {
-      throw MetaDataError("date", create_date_value);
-    }
+    throw MetaDataError("create_date", create_date_value);
   }
 
   meta_data.ip = mapper_.get("ip");
@@ -70,7 +80,7 @@ MetaData MetaService::readMetaData() const {
   }
   meta_data.timeout = timeout;
 
-  meta_data.version = mapper_.get("timeout");
+  meta_data.version = mapper_.get("version");
 
   return meta_data;
 }
