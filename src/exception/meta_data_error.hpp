@@ -26,7 +26,7 @@ class MetaDataError : public Exception {
  public:
   MetaDataError(const std::string& key, const std::string& value)
       : Exception(
-            fmt::format("invalid config (key='{}', value='{}')", key, value)) {}
+            fmt::format("invalid meta (key='{}', value='{}')", key, value)) {}
 };
 
 }  // namespace waka::exception
