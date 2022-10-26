@@ -16,25 +16,24 @@
 
 #include <spdlog/spdlog.h>
 
-#include <common/http.hpp>
 #include <common/pattern.hpp>
 #include <dto/status_bar/get.hpp>
-#include <service/heartbeat_service.hpp>
 
-using httplib::Request;
-using httplib::Response;
+using std::int64_t;
 using waka::common::formatTime;
-using waka::common::HttpStatus;
 using waka::dto::statusbar::get::Result;
-using waka::service::HeartbeatService;
+using waka::http::Request;
+using waka::http::Response;
+using waka::http::Status;
 
 namespace waka::controller {
 
-void getStatusBar(const Request& req, Response& resp) {
-  int64_t msec = HeartbeatService{}.today();
+void StatusBarController::get(const Request& req, Response& resp) {
+  SPDLOG_DEBUG("GET /api/users/current/statusbar/today");
+  int64_t msec = heartbeat_service_.today();
   Result result(formatTime(msec));
-  resp.status = HttpStatus::kOK;
-  resp.set_content(result.toJson(), "application/json");
+  resp.setStatus(Status::kOK);
+  resp.setContent(result.toJSON().dump(), "application/json");
   SPDLOG_INFO("GET /api/users/current/statusbar/today 200");
 }
 

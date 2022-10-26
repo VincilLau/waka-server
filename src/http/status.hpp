@@ -17,7 +17,7 @@
 
 namespace waka::http {
 
-enum HTTPStatus {
+enum Status {
   kContinue = 100,
   kSwitchingProtocols = 101,
   kProcessing = 102,

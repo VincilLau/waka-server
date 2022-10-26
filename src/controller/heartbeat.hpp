@@ -15,11 +15,29 @@
 #ifndef WAKA_SRC_CONTROLLER_HEARTBEAT_HPP_
 #define WAKA_SRC_CONTROLLER_HEARTBEAT_HPP_
 
-#include <httplib.h>
+#include <bo/heartbeat.hpp>
+#include <dto/heartbeat/post.hpp>
+#include <http/http.hpp>
+#include <service/heartbeat_service.hpp>
 
 namespace waka::controller {
 
-void postHeartbeat(const httplib::Request& req, httplib::Response& resp);
+class HeartbeatController {
+ public:
+  // POST /api/users/current/heartbeats.bulk
+  void post(const http::Request& req, http::Response& resp);
+
+ private:
+  [[nodiscard]] dto::heartbeat::post::Result saveHeartbeats(
+      const dto::heartbeat::post::Param& param) const;
+
+  [[nodiscard]] static bool checkDto(const dto::heartbeat::post::Heartbeat& dto,
+                                     std::size_t index);
+  static bo::Heartbeat dtoToBO(const dto::heartbeat::post::Heartbeat& dto);
+
+ private:
+  service::HeartbeatService heartbeat_service_;
+};
 
 }  // namespace waka::controller
 

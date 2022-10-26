@@ -12,15 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_CONTROLLER_SUMMARIES_HPP_
-#define WAKA_SRC_CONTROLLER_SUMMARIES_HPP_
+#ifndef WAKA_SRC_HTTP_METHOD_HPP_
+#define WAKA_SRC_HTTP_METHOD_HPP_
 
-#include <httplib.h>
+namespace waka::http {
 
-namespace waka::controller {
+enum Method {
+  GET,
+  HEAD,
+  POST,
+  PUT,
+  DELETE,
+  CONNECT,
+  OPTIONS,
+  TRACE,
+  PATCH,
+};
 
-void getSummaries(const httplib::Request& req, httplib::Response& resp);
+}
 
-}  // namespace waka::controller
-
-#endif  // WAKA_SRC_CONTROLLER_SUMMARIES_HPP_
+#endif  // WAKA_SRC_HTTP_METHOD_HPP_

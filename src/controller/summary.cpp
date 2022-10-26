@@ -12,111 +12,122 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "summaries.hpp"
+#include "summary.hpp"
 
 #include <spdlog/spdlog.h>
 
-#include <common/date.hpp>
-#include <common/http.hpp>
 #include <common/pattern.hpp>
 #include <dto/summary/get.hpp>
 #include <exception/date_error.hpp>
-#include <service/heartbeat_service.hpp>
 
 #include "msg.hpp"
 
 using fmt::format;
-using httplib::Request;
-using httplib::Response;
+using std::int64_t;
 using std::string;
+using waka::bo::Summary;
 using waka::common::Date;
 using waka::common::formatTime;
-using waka::common::HttpStatus;
+using waka::dto::summary::get::Item;
 using waka::dto::summary::get::Result;
-using waka::dto::summary::get::Summary;
 using waka::exception::DateError;
-using waka::service::HeartbeatService;
+using waka::http::Request;
+using waka::http::Response;
+using waka::http::Status;
 
 namespace waka::controller {
 
-void getSummaries(const Request& req, Response& resp) {
-  string start_param = req.get_param_value("start");
-  string end_param = req.get_param_value("end");
-  Date start{0, 0, 0};
-  Date end{0, 0, 0};
+bool SummaryController::parseGetParam(const Request& req, Response& resp,
+                                      Date& start, Date& end) {
+  string start_param = req.getParam("start");
+  string end_param = req.getParam("end");
+
   try {
     start = Date::parse(start_param);
     end = Date::parse(end_param);
   } catch (const DateError& e) {
-    resp.status = HttpStatus::kBadRequest;
-    resp.set_content(jsonMsg(e.what()), "application/json");
-    return;
-  }
-  if (start > end) {
-    resp.status = HttpStatus::kBadRequest;
-    resp.set_content("start can't be greater than end", "application/json");
-    SPDLOG_WARN(
-        format("GET /api/summaries 400, msg='start({}) can't be greater "
-               "than end({})'",
-               start.toString(), end.toString()));
-    return;
+    resp.setStatus(Status::kBadRequest);
+    resp.setContent(jsonMsg(e.what()), "application/json");
+    return false;
   }
 
-  auto summaries = HeartbeatService{}.summarize(start, end);
+  if (start > end) {
+    SPDLOG_WARN(
+        format("GET /api/summary 400, msg='start({}) can't be greater "
+               "than end({})'",
+               start.toString(), end.toString()));
+    resp.setStatus(Status::kBadRequest);
+    resp.setContent(jsonMsg("start can't be greater than end"),
+                    "application/json");
+
+    return false;
+  }
+
+  return true;
+}
+
+static Result summaryToResult(Summary summary, const Date& start,
+
+                              const Date& end) {
+  SPDLOG_DEBUG("GET /api/summary");
 
   Result result;
   result.total.start = start.toString();
   result.total.end = end.toString();
-  result.total.time_text = formatTime(summaries.total_msec);
-  result.total.total_msec = summaries.total_msec;
-
-  for (int64_t msec : summaries.msec_per_day) {
+  result.total.time_text = formatTime(summary.total_msec);
+  result.total.total_msec = summary.total_msec;
+  for (int64_t msec : summary.daily_msec) {
     result.days.push_back({msec, formatTime(msec)});
   }
 
-  for (auto& i : summaries.categories) {
-    Summary s;
-    s.name = std::move(i.first);
-    s.time_text = formatTime(i.second);
-    s.total_msec = i.second;
-    result.categories.array.push_back(std::move(s));
-  }
-
-  for (auto& i : summaries.editors) {
-    Summary s;
+  for (auto& i : summary.editors) {
+    Item s;
     s.name = std::move(i.first);
     s.time_text = formatTime(i.second);
     s.total_msec = i.second;
     result.editors.array.push_back(std::move(s));
   }
 
-  for (auto& i : summaries.languages) {
-    Summary s;
+  for (auto& i : summary.languages) {
+    Item s;
     s.name = std::move(i.first);
     s.time_text = formatTime(i.second);
     s.total_msec = i.second;
     result.languages.array.push_back(std::move(s));
   }
 
-  for (auto& i : summaries.oss) {
-    Summary s;
+  for (auto& i : summary.oss) {
+    Item s;
     s.name = std::move(i.first);
     s.time_text = formatTime(i.second);
     s.total_msec = i.second;
     result.oss.array.push_back(std::move(s));
   }
 
-  for (auto& i : summaries.projects) {
-    Summary s;
+  for (auto& i : summary.projects) {
+    Item s;
     s.name = std::move(i.first);
     s.time_text = formatTime(i.second);
     s.total_msec = i.second;
     result.projects.array.push_back(std::move(s));
   }
 
-  resp.status = HttpStatus::kOK;
-  resp.set_content(result.toJson(), "application/json");
-  SPDLOG_INFO("GET /api/summaries 200");
+  return result;
+}
+
+void SummaryController::get(const Request& req, Response& resp) {
+  Date start = Date::today();
+  Date end = start;
+  bool ok = parseGetParam(req, resp, start, end);
+  if (!ok) {
+    return;
+  }
+
+  Summary summary = heartbeat_service_.summarize(start, end);
+  Result result = summaryToResult(std::move(summary), start, end);
+  resp.setStatus(Status::kOK);
+  resp.setContent(result.toJSON().dump(), "application/json");
+  SPDLOG_INFO("GET /api/summary 200");
 }
 
 }  // namespace waka::controller

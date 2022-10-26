@@ -16,92 +16,81 @@
 
 #include <spdlog/spdlog.h>
 
-#include <cassert>
-#include <common/config.hpp>
-#include <common/http.hpp>
-#include <common/log.hpp>
-#include <common/pattern.hpp>
 #include <dto/config/get.hpp>
-#include <dto/config/put.hpp>
 #include <exception/json_error.hpp>
-#include <service/meta_service.hpp>
+#include <exception/meta_data_error.hpp>
 
 #include "msg.hpp"
 
 using fmt::format;
-using httplib::Request;
-using httplib::Response;
 using std::string;
-using waka::common::Config;
-using waka::common::HttpStatus;
-using waka::common::isValidIP;
+using waka::common::MetaData;
 using waka::dto::config::get::Result;
 using waka::dto::config::put::Param;
-using waka::exception::JsonError;
-using waka::service::MetaService;
+using waka::exception::JSONError;
+using waka::exception::MetaDataError;
+using waka::http::Request;
+using waka::http::Response;
+using waka::http::Status;
 
 namespace waka::controller {
 
-void getConfig(const Request& req, Response& resp) {
-  Config config = MetaService{}.loadConfig();
+void ConfigController::get(const Request& req, Response& resp) {
+  SPDLOG_DEBUG("GET /api/config");
 
+  MetaData meta_data = meta_service_.readMetaData();
   Result result;
-  result.ip = config.ip();
-  result.port = config.port();
-  result.time_format = config.timeFormat();
-  result.timeout = config.timeout();
+  result.ip = std::move(meta_data.ip);
+  result.port = meta_data.port;
+  result.time_format = meta_data.time_format;
+  result.timeout = meta_data.timeout;
+  result.log_level = std::move(meta_data.log_level);
 
-  string logLevelStr = config.logLevel();
-  assert(!logLevelStr.empty());
-  result.log_level = std::move(logLevelStr);
-
-  resp.status = HttpStatus::kOK;
-  resp.set_content(result.toJson(), "application/json");
+  resp.setStatus(Status::kOK);
+  resp.setContent(result.toJSON().dump(), "application/json");
   SPDLOG_INFO("GET /api/config 200");
 }
 
-static string parsePutConfigBody(const string& body, Param& param) {
-  try {
-    param = Param::fromJson(body);
-  } catch (const JsonError& e) {
-    return jsonMsg(e.what());
-  }
+void ConfigController::put(const Request& req, Response& resp) {
+  SPDLOG_DEBUG("PUT /api/config");
 
-  if (param.port < 1 || param.port > 65535) {
-    return jsonMsg("port must be in the range of 1~65535");
-  }
-  if (param.timeout < 1 || param.timeout > Config::kMaxTimeout) {
-    string error =
-        format("timeout must be in the range of 1~{}", Config::kMaxTimeout);
-    return jsonMsg(std::move(error));
-  }
-  if (!isValidIP(param.ip)) {
-    string error = format("invalid ip address '{}'", param.ip);
-    return jsonMsg(std::move(error));
-  }
-  return "";
-}
-
-void putConfig(const Request& req, Response& resp) {
-  Param param;
-  string msg = parsePutConfigBody(req.body, param);
-  if (!msg.empty()) {
-    resp.status = HttpStatus::kBadRequest;
-    resp.set_content(msg, "application/json");
-    SPDLOG_WARN("PUT /api/config 400, msg='{}', data='{}'", msg, req.body);
+  string mime_type = req.getParam("Content-Type");
+  if (mime_type != "application/json") {
+    string msg = format("unexpected mime type {}", mime_type);
+    SPDLOG_WARN("PUT /api/config -- {}", msg);
+    resp.setStatus(Status::kBadRequest);
+    resp.setContent(jsonMsg(msg), "application/json");
     return;
   }
 
-  Config config;
-  config.setIP(param.ip);
-  config.setLogLevel(param.log_level);
-  config.setTimeFormat(param.time_format);
-  config.setPort(param.port);
-  config.setTimeout(param.timeout);
-  MetaService{}.storeConfig(config);
+  Param param;
+  try {
+    param = Param::fromJSON(req.getBody());
+  } catch (const JSONError& e) {
+    SPDLOG_WARN("PUT /api/config -- {}", e.what());
+    resp.setStatus(Status::kBadRequest);
+    resp.setContent(jsonMsg(e.what()), "application/json");
+    return;
+  }
 
-  resp.status = HttpStatus::kOK;
-  resp.set_content(jsonMsg("ok"), "application/json");
+  MetaData meta_data;
+  meta_data.ip = std::move(param.ip);
+  meta_data.log_level = std::move(param.log_level);
+  meta_data.time_format = std::move(param.time_format);
+  meta_data.port = param.port;
+  meta_data.timeout = param.timeout;
+  // 如果客户端发送的配置不合法，则会抛出MetaDataError异常
+  try {
+    meta_service_.writeMetaData(meta_data);
+  } catch (const MetaDataError& e) {
+    SPDLOG_WARN("PUT /api/config -- {}", e.what());
+    resp.setStatus(Status::kBadRequest);
+    resp.setContent(jsonMsg(e.what()), "application/json");
+    return;
+  }
+
+  resp.setStatus(Status::kOK);
+  resp.setContent(jsonMsg("ok"), "application/json");
   SPDLOG_INFO("PUT /api/config 200");
 }
 

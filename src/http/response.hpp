@@ -25,7 +25,7 @@ namespace waka::http {
 
 class Response {
  public:
-  virtual void setStatus(HTTPStatus status) = 0;
+  virtual void setStatus(Status status) = 0;
   virtual void addHeader(const char* key, const char* value) = 0;
   virtual void setContent(const std::string& data, const char* mime_type) = 0;
 };
@@ -34,7 +34,7 @@ class HTTPLibResponse : public Response {
  public:
   HTTPLibResponse(httplib::Response& resp) : resp_(resp) {}
 
-  void setStatus(HTTPStatus status) override { resp_.status = status; }
+  void setStatus(Status status) override { resp_.status = status; }
   void addHeader(const char* key, const char* value) override {
     resp_.set_header(key, value);
   }

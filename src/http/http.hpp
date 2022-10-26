@@ -15,6 +15,7 @@
 #ifndef WAKA_SRC_HTTP_HTTP_HPP_
 #define WAKA_SRC_HTTP_HTTP_HPP_
 
+#include "method.hpp"
 #include "request.hpp"
 #include "response.hpp"
 #include "status.hpp"

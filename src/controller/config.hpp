@@ -15,14 +15,22 @@
 #ifndef WAKA_SRC_CONTROLLER_CONFIG_HPP_
 #define WAKA_SRC_CONTROLLER_CONFIG_HPP_
 
-#include <httplib.h>
+#include <dto/config/put.hpp>
+#include <http/http.hpp>
+#include <service/meta_service.hpp>
 
 namespace waka::controller {
 
-// GET /api/config
-void getConfig(const httplib::Request& rep, httplib::Response& resp);
-// PUT /api/config
-void putConfig(const httplib::Request& rep, httplib::Response& resp);
+class ConfigController {
+ public:
+  // GET /api/config
+  void get(const http::Request& rep, http::Response& resp);
+  // PUT /api/config
+  void put(const http::Request& rep, http::Response& resp);
+
+ private:
+  service::MetaService meta_service_;
+};
 
 }  // namespace waka::controller
 

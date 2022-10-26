@@ -19,8 +19,8 @@
 
 namespace waka::controller {
 
-[[nodiscard]] inline static std::string jsonMsg(std::string error) {
-  return nlohmann::json{{"message", std::move(error)}}.dump();
+[[nodiscard]] inline static std::string jsonMsg(std::string msg) {
+  return nlohmann::json{{"message", std::move(msg)}}.dump();
 }
 
 }  // namespace waka::controller

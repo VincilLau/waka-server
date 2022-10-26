@@ -21,6 +21,8 @@
 namespace waka::dto::statusbar::get {
 
 struct Result {
+  Result(std::string text) : time_text(std::move(text)) {}
+
   [[nodiscard]] nlohmann::json toJSON() const {
     return {{"data",
              {{

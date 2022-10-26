@@ -12,23 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_CONTROLLER_STATUS_BAR_HPP_
-#define WAKA_SRC_CONTROLLER_STATUS_BAR_HPP_
+#ifndef WAKA_SRC_CONTROLLER_SUMMARY_HPP_
+#define WAKA_SRC_CONTROLLER_SUMMARY_HPP_
 
+#include <common/date.hpp>
 #include <http/http.hpp>
 #include <service/heartbeat_service.hpp>
 
 namespace waka::controller {
 
-class StatusBarController {
+class SummaryController {
  public:
-  // GET /api/users/current/statusbar/today
   void get(const http::Request& req, http::Response& resp);
 
  private:
+  [[nodiscard]] static bool parseGetParam(const http::Request& req,
+                                          http::Response& resp,
+                                          common::Date& start,
+                                          common::Date& end);
+
   service::HeartbeatService heartbeat_service_;
 };
 
 }  // namespace waka::controller
 
-#endif  // WAKA_SRC_CONTROLLER_STATUS_BAR_HPP_
+#endif  // WAKA_SRC_CONTROLLER_SUMMARY_HPP_
