@@ -61,8 +61,7 @@ static const unordered_map<string, string> kOSMap = {
 };
 
 static const unordered_map<string, string> kEditorMap = {
-    {"vscode", "VS Code"},   //
-    {"unknown", "Unknown"},  //
+    {"vscode", "VS Code"},
 };
 
 void parseUserAgent(const string& ua, string& os, string& editor) {
@@ -85,9 +84,9 @@ void parseUserAgent(const string& ua, string& os, string& editor) {
     os = os_iter->second;
   }
 
-  auto editor_iter = kEditorMap.find(os);
+  auto editor_iter = kEditorMap.find(editor);
   if (editor_iter != kEditorMap.end()) {
-    os = editor_iter->second;
+    editor = editor_iter->second;
   }
 }
 
