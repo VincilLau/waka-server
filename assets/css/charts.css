@@ -14,38 +14,38 @@
  * limitations under the License.
  */
 
-html,
-body {
-  height: 100%;
-  margin: 0;
-  overflow-y: hidden;
-  padding: 0;
+#charts {
   width: 100%;
 }
 
-main {
-  height: 100%;
-  left: 130px;
-  overflow-y: auto;
-  position: absolute;
-  right: 0;
-  top: 0;
+.card {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  border-radius: 8px;
 }
 
-#title {
-  font-size: 22px;
-  width: 90%;
-  margin-left: 5%;
-  margin-right: 5%;
-  margin-top: 20px;
-  margin-bottom: 20px;
+#line-chart {
+  height: 300px;
+  margin-left: 3%;
+  margin-right: 3%;
+  width: 94%;
 }
 
-#title-day {
-  font-weight: bold;
+.left-pie-chart {
+  float: left;
+  height: 300px;
+  width: 46%;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  margin-left: 3%;
+  margin-right: 1%;
 }
 
-#title-time {
-  color: #36558b;
-  text-decoration: underline dotted;
+.right-pie-chart {
+  float: right;
+  height: 300px;
+  width: 46%;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  margin-left: 1%;
+  margin-right: 3%;
 }
