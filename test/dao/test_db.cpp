@@ -33,28 +33,21 @@ using waka::exception::DBError;
 
 namespace waka::dao {
 
-static void closeDB(DB db) { sqlite3_close(db); }
-
-TEST(DBTest, testGetSet) {
-  DB db = reinterpret_cast<DB>(1);
-  setDB(db);
-  EXPECT_EQ(reinterpret_cast<size_t>(getDB()), 1);
-}
-
 TEST(DBTest, testOpenDBSuccess) {
   string data_dir =
       path{temp_directory_path()} / "waka-server-test" / genUUIDv4();
   create_directories(data_dir);
 
-  DB db = openDB(data_dir);
-  EXPECT_NE(db, nullptr);
+  DB db;
+  db.open(data_dir);
 }
 
 TEST(DBTest, testOpenDBDataDirNotExists) {
   string data_dir =
       path{temp_directory_path()} / "waka-server-test" / genUUIDv4();
 
-  EXPECT_THROW(DB db = openDB(data_dir), DBError);
+  DB db;
+  EXPECT_THROW(db.open(data_dir), DBError);
 }
 
 TEST(DBTest, testOpenDBDataDirNotDir) {
@@ -64,7 +57,8 @@ TEST(DBTest, testOpenDBDataDirNotDir) {
   ASSERT_TRUE(ofs.is_open());
   ofs.close();
 
-  EXPECT_THROW(DB db = openDB(data_dir), DBError);
+  DB db;
+  EXPECT_THROW(db.open(data_dir), DBError);
 }
 
 TEST(DBTest, testOpenDBDataDirNoPerms) {
@@ -73,7 +67,8 @@ TEST(DBTest, testOpenDBDataDirNoPerms) {
   create_directories(data_dir);
   permissions(data_dir, perms::none, perm_options::replace);
 
-  EXPECT_THROW(DB db = openDB(data_dir), DBError);
+  DB db;
+  EXPECT_THROW(db.open(data_dir), DBError);
 }
 
 }  // namespace waka::dao

@@ -22,11 +22,16 @@ target("test_common_uuid")
     add_deps("waka-server_static", "test_main")
     add_links("waka-server_static", "test_main")
 
-    add_packages(
-        "cpp-httplib",
-        "fmt",
-        "gtest",
-        "nlohmann_json",
-        "spdlog",
-        "sqlite"
-    )
+    add_packages("gtest")
+
+target("test_common_date")
+    set_kind("binary")
+    set_group("test")
+
+    add_files("test_date.cpp")
+    add_includedirs("$(projectdir)/src")
+
+    add_deps("waka-server_static", "test_main")
+    add_links("waka-server_static", "test_main")
+
+    add_packages("gtest")

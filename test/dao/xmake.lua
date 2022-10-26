@@ -23,10 +23,7 @@ target("test_dao_db")
     add_links("waka-server_static", "test_main")
 
     add_packages(
-        "cpp-httplib",
         "fmt",
         "gtest",
-        "nlohmann_json",
-        "spdlog",
         "sqlite"
     )
