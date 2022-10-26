@@ -49,7 +49,7 @@ void initLogger(const string& data_dir) {
 #endif  // #ifdef WAKA_PLATFORM_LINUX
 }
 
-string logLevelToStr(int level) {
+const char* logLevelToStr(int level) {
   switch (level) {
     case spdlog::level::trace:
       return "trace";

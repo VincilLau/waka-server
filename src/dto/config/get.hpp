@@ -23,7 +23,15 @@ namespace waka::dto::config::get {
 
 struct Result {
  public:
-  std::string toJson() const;
+  [[nodiscard]] nlohmann::json toJSON() const {
+    return {
+        {"ip", ip},                    //
+        {"log_level", log_level},      //
+        {"port", port},                //
+        {"timeout", timeout},          //
+        {"time_format", time_format},  //
+    };
+  }
 
   std::string ip;
   std::string log_level;
@@ -31,17 +39,6 @@ struct Result {
   int timeout;
   std::string time_format;
 };
-
-inline std::string Result::toJson() const {
-  nlohmann::json j = {
-      {"ip", ip},                    //
-      {"log_level", log_level},      //
-      {"port", port},                //
-      {"timeout", timeout},          //
-      {"time_format", time_format},  //
-  };
-  return j.dump();
-}
 
 }  // namespace waka::dto::config::get
 

@@ -21,16 +21,18 @@
 namespace waka::dto::statusbar::get {
 
 struct Result {
-  Result(std::string time_text) : text(std::move(time_text)) {}
-  std::string toJson() const;
+  [[nodiscard]] nlohmann::json toJSON() const {
+    return {{"data",
+             {{
+                 "grand_total",
+                 {
+                     {"text", time_text},
+                 }  //
+             }}}};
+  }
 
-  std::string text;
+  std::string time_text;
 };
-
-inline std::string Result::toJson() const {
-  nlohmann::json j = {{"data", {{"grand_total", {{"text", text}}}}}};
-  return j.dump();
-}
 
 }  // namespace waka::dto::statusbar::get
 

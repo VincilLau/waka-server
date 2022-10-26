@@ -30,7 +30,7 @@ void initLogger(const std::string& data_dir);
 
 // 将日志级别从整数形式转换为字符串形式
 // 例如从2转换为info
-[[nodiscard]] std::string logLevelToStr(int level);
+[[nodiscard]] const char* logLevelToStr(int level);
 // 将日志级别从字符串形式转换为整数形式
 // 例如从info转换为2
 [[nodiscard]] int strToLogLevel(const std::string& str);

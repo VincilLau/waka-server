@@ -15,17 +15,13 @@
 #ifndef WAKA_SRC_DTO_CONFIG_PUT_HPP_
 #define WAKA_SRC_DTO_CONFIG_PUT_HPP_
 
-#include <fmt/format.h>
-
-#include <exception/json_error.hpp>
-#include <nlohmann/json.hpp>
 #include <string>
 
 namespace waka::dto::config::put {
 
 struct Param {
  public:
-  static Param fromJson(const std::string& json);
+  [[nodiscard]] static Param fromJSON(const std::string& json_str);
 
   std::string ip;
   std::string log_level;
@@ -33,66 +29,6 @@ struct Param {
   int timeout;
   std::string time_format;
 };
-
-inline Param Param::fromJson(const std::string& json) {
-  Param param;
-  nlohmann::json j;
-  try {
-    j = nlohmann::json::parse(json);
-  } catch (const nlohmann::json::parse_error& e) {
-    throw exception::JsonError(e.what());
-  }
-
-  if (j.is_null()) {
-    throw exception::JsonError("param can't be null");
-  } else if (!j.is_object()) {
-    throw exception::JsonError(
-        fmt::format("param must be a object, not {}", j.type_name()));
-  }
-
-  auto ip = j["ip"];
-  auto log_level = j["log_level"];
-  auto port = j["port"];
-  auto timeout = j["timeout"];
-  auto time_format = j["time_format"];
-
-  if (ip.is_null()) {
-    throw exception::JsonError("'ip' can't be null");
-  } else if (log_level.is_null()) {
-    throw exception::JsonError("'log_level' can't be null");
-  } else if (port.is_null()) {
-    throw exception::JsonError("'port' can't be null");
-  } else if (timeout.is_null()) {
-    throw exception::JsonError("'timeout' can't be null");
-  } else if (time_format.is_null()) {
-    throw exception::JsonError("'time_format' can't be null");
-  }
-
-  if (!ip.is_string()) {
-    throw exception::JsonError(
-        fmt::format("'ip' must be a string, not {}", j.type_name()));
-  } else if (!log_level.is_string()) {
-    throw exception::JsonError(
-        fmt::format("'log_level' must be a string, not {}", j.type_name()));
-  } else if (!port.is_number_integer()) {
-    throw exception::JsonError(
-        fmt::format("'port' must be a integer, not {}", j.type_name()));
-  } else if (!timeout.is_number_integer()) {
-    throw exception::JsonError(
-        fmt::format("'timeout' must be a integer, not {}", j.type_name()));
-  } else if (!time_format.is_string()) {
-    throw exception::JsonError(
-        fmt::format("'time_format' must be a string, not {}", j.type_name()));
-  }
-
-  param.ip = ip;
-  param.log_level = log_level;
-  param.port = port;
-  param.timeout = timeout;
-  param.time_format = time_format;
-
-  return param;
-}
 
 }  // namespace waka::dto::config::put
 

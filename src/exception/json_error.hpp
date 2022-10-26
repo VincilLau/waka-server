@@ -21,9 +21,9 @@
 namespace waka::exception {
 
 // JSON解析错误
-class JsonError : public Exception {
+class JSONError : public Exception {
  public:
-  explicit JsonError(std::string reason) : Exception(std::move(reason)) {}
+  explicit JSONError(std::string reason) : Exception(std::move(reason)) {}
 };
 
 }  // namespace waka::exception

@@ -22,49 +22,53 @@
 
 namespace waka::dto::summary::get {
 
-struct Summary {
-  [[nodiscard]] nlohmann::json toJson() const;
+struct Item {
+  [[nodiscard]] nlohmann::json toJSON() const {
+    return {
+        {"name", name},
+        {"time_text", time_text},
+        {"total_msec", total_msec},
+    };
+  }
 
   std::string name;
   std::string time_text;
   std::int64_t total_msec;
 };
 
-inline nlohmann::json Summary::toJson() const {
-  return {
-      {"name", name},
-      {"time_text", time_text},
-      {"total_msec", total_msec},
-  };
-}
+struct ItemArray {
+  [[nodiscard]] nlohmann::json toJSON() const {
+    nlohmann::json::array_t j;
+    for (const auto& i : array) {
+      j.push_back(i.toJSON());
+    }
+    return j;
+  }
 
-struct SummaryArray {
-  [[nodiscard]] nlohmann::json toJson() const;
-
-  std::vector<Summary> array;
+  std::vector<Item> array;
 };
 
-inline nlohmann::json SummaryArray::toJson() const {
-  nlohmann::json::array_t j;
-  for (const auto& i : array) {
-    j.push_back(std::move(i.toJson()));
-  }
-  return j;
-}
-
 struct Day {
-  [[nodiscard]] nlohmann::json toJson() const;
+  [[nodiscard]] nlohmann::json toJSON() const {
+    return {
+        {"total_msec", total_msec},  //
+        {"time_text", time_text},    //
+    };
+  }
 
   std::int64_t total_msec;
   std::string time_text;
 };
 
-inline nlohmann::json Day::toJson() const {
-  return {{"total_msec", total_msec}, {"time_text", time_text}};
-}
-
 struct Total {
-  [[nodiscard]] nlohmann::json toJson() const;
+  [[nodiscard]] nlohmann::json toJSON() const {
+    return {
+        {"end", end},
+        {"start", start},
+        {"time_text", time_text},
+        {"total_msec", total_msec},
+    };
+  }
 
   std::string end;
   std::string start;
@@ -72,40 +76,31 @@ struct Total {
   std::int64_t total_msec;
 };
 
-inline nlohmann::json Total::toJson() const {
-  return {
-      {"end", end},
-      {"start", start},
-      {"time_text", time_text},
-      {"total_msec", total_msec},
-  };
-}
-
 struct Result {
-  [[nodiscard]] std::string toJson() const;
+  [[nodiscard]] nlohmann::json toJSON() const;
 
-  SummaryArray categories;
   std::vector<Day> days;
-  SummaryArray editors;
-  SummaryArray languages;
-  SummaryArray oss;
-  SummaryArray projects;
+  ItemArray editors;
+  ItemArray languages;
+  ItemArray oss;
+  ItemArray projects;
   Total total;
 };
 
-inline std::string Result::toJson() const {
+inline nlohmann::json Result::toJSON() const {
   nlohmann::json::array_t days_json;
-  for (const auto& day : days) {
-    days_json.push_back(day.toJson());
+  for (const auto& d : days) {
+    days_json.push_back(d.toJSON());
   }
 
-  nlohmann::json j = {{"categories", categories.toJson()},  //
-                      {"editors", editors.toJson()},        //
-                      {"languages", languages.toJson()},    //
-                      {"oss", oss.toJson()},                //
-                      {"projects", projects.toJson()},      //
-                      {"total", total.toJson()},            //
-                      {"days", days_json}};                 //
+  nlohmann::json j = {
+      {"editors", editors.toJSON()},      //
+      {"languages", languages.toJSON()},  //
+      {"oss", oss.toJSON()},              //
+      {"projects", projects.toJSON()},    //
+      {"total", total.toJSON()},          //
+      {"days", std::move(days_json)},     //
+  };
   return j.dump();
 }
 
