@@ -12,18 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_EXCEPTION_HTTPLIB_ERROR_HPP_
-#define WAKA_SRC_EXCEPTION_HTTPLIB_ERROR_HPP_
+#ifndef WAKA_SRC_HTTP_HTTP_HPP_
+#define WAKA_SRC_HTTP_HTTP_HPP_
 
-#include "exception.hpp"
+#include "request.hpp"
+#include "response.hpp"
+#include "status.hpp"
 
-namespace waka::exception {
-
-class HttplibError : public Exception {
- public:
-  explicit HttplibError(std::string reason) : Exception(std::move(reason)) {}
-};
-
-}  // namespace waka::exception
-
-#endif  // WAKA_SRC_EXCEPTION_HTTPLIB_ERROR_HPP_
+#endif  // WAKA_SRC_HTTP_HTTP_HPP_

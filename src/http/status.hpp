@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_COMMON_HTTP_HPP_
-#define WAKA_SRC_COMMON_HTTP_HPP_
+#ifndef WAKA_SRC_HTTP_STATUS_HPP_
+#define WAKA_SRC_HTTP_STATUS_HPP_
 
-namespace waka::common {
+namespace waka::http {
 
-enum HttpStatus {
+enum HTTPStatus {
   kContinue = 100,
   kSwitchingProtocols = 101,
   kProcessing = 102,
@@ -83,6 +83,6 @@ enum HttpStatus {
   kNetworkAuthenticationRequired = 511,
 };
 
-}  // namespace waka::common
+}  // namespace waka::http
 
-#endif  // WAKA_SRC_COMMON_HTTP_HPP_
+#endif  // WAKA_SRC_HTTP_STATUS_HPP_
