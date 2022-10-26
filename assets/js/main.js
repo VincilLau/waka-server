@@ -59,7 +59,7 @@ function getStartAndEnd() {
 
 function getSummeries(start, end, callback) {
   $.ajax({
-    url: "/api/summaries",
+    url: "/api/summary",
     data: {
       start: dateText(start),
       end: dateText(end),
@@ -73,25 +73,25 @@ function getSummeries(start, end, callback) {
   });
 }
 
-function drawLineChart(summaries) {
-  $("#title-day").text(summaries.days.length);
-  $("#title-time").text(summaries.total.time_text);
+function drawLineChart(summary) {
+  $("#title-day").text(summary.days.length);
+  $("#title-time").text(summary.total.time_text);
 
-  let date = new Date(Date.parse(summaries.total.start));
+  let date = new Date(Date.parse(summary.total.start));
   let lineChart = new LineChart("line-chart");
-  for (let i = 0; i < summaries.days.length; i++) {
+  for (let i = 0; i < summary.days.length; i++) {
     lineChart.data.push({
       date: dateText(date),
-      hours: summaries.days[i].total_msec / 1000 / 3600,
-      timeText: summaries.days[i].time_text,
+      hours: summary.days[i].total_msec / 1000 / 3600,
+      timeText: summary.days[i].time_text,
     });
     date = nextDay(date);
   }
   lineChart.draw();
 }
 
-function drawCharts(summaries) {
-  drawLineChart(summaries);
+function drawCharts(summary) {
+  drawLineChart(summary);
 }
 
 function main() {
