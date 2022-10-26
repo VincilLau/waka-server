@@ -89,9 +89,6 @@ static Heartbeat heartbeatFromJSON(const json& j, size_t index) {
                 format("[{}]cursorpos", index))) {
     h.cursorpos = make_shared<int64_t>(cursorpos);
   }
-  if (checkType(dependencies, json::value_t::array,
-                format("[{}]dependencies", index))) {
-  }
   if (checkType(entity, json::value_t::string, format("[{}]entity", index))) {
     h.entity = make_shared<string>(entity);
   }
@@ -125,17 +122,19 @@ static Heartbeat heartbeatFromJSON(const json& j, size_t index) {
     h.user_agent = make_shared<string>(user_agent);
   }
 
-  for (size_t i = 0; i < dependencies.size(); i++) {
-    const auto& d = dependencies[i];
-    bool ok = checkType(d, json::value_t::string,
-                        format("[{}]dependencies[{}]", index, i));
-    if (!ok) {
-      string msg = format("[{}].dependencies[{}] can't be null", index, i);
-      throw JSONError(msg);
+  if (checkType(dependencies, json::value_t::array,
+                format("[{}]dependencies", index))) {
+    for (size_t i = 0; i < dependencies.size(); i++) {
+      const auto& d = dependencies[i];
+      bool ok = checkType(d, json::value_t::string,
+                          format("[{}]dependencies[{}]", index, i));
+      if (!ok) {
+        string msg = format("[{}].dependencies[{}] can't be null", index, i);
+        throw JSONError(msg);
+      }
     }
+    h.dependencies = make_shared<vector<string>>(dependencies);
   }
-
-  h.dependencies = make_shared<vector<string>>(dependencies);
 
   return h;
 }
