@@ -41,6 +41,7 @@ target("waka-server")
     add_links("waka-server_static")
 
     add_packages(
+        "cli11",
         "cpp-httplib",
         "fmt",
         "nlohmann_json",
@@ -75,7 +76,6 @@ target("waka-server_static")
     end
 
     add_packages(
-        "cli11",
         "cpp-httplib",
         "fmt",
         "nlohmann_json",
