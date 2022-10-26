@@ -22,12 +22,10 @@ namespace waka::bo {
 
 struct Heartbeat {
   std::string branch;
-  std::string category;
   std::string entity;
   std::string language;
   std::string project;
   std::int64_t time;
-  std::string type;
   std::string user_agent;
 };
 

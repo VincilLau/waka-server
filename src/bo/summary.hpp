@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_BO_SUMMARIES_HPP_
-#define WAKA_SRC_BO_SUMMARIES_HPP_
+#ifndef WAKA_SRC_BO_SUMMARY_HPP_
+#define WAKA_SRC_BO_SUMMARY_HPP_
 
 #include <cstdint>
 #include <string>
@@ -22,16 +22,15 @@
 
 namespace waka::bo {
 
-struct Summaries {
-  std::unordered_map<std::string, std::int64_t> categories;
+struct Summary {
+  std::vector<std::int64_t> daily_msec;
   std::unordered_map<std::string, std::int64_t> editors;
   std::unordered_map<std::string, std::int64_t> languages;
   std::unordered_map<std::string, std::int64_t> oss;
   std::unordered_map<std::string, std::int64_t> projects;
   std::int64_t total_msec = 0;
-  std::vector<std::int64_t> msec_per_day;
 };
 
 }  // namespace waka::bo
 
-#endif  // WAKA_SRC_BO_SUMMARIES_HPP_
+#endif  // WAKA_SRC_BO_SUMMARY_HPP_
