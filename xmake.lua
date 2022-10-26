@@ -19,6 +19,7 @@ set_languages("c++17")
 
 add_rules("mode.debug", "mode.release")
 add_requires(
+    "cli11",
     "cpp-httplib",
     "fmt",
     "gtest",
@@ -74,6 +75,7 @@ target("waka-server_static")
     end
 
     add_packages(
+        "cli11",
         "cpp-httplib",
         "fmt",
         "nlohmann_json",
