@@ -19,8 +19,10 @@
 #include <controller/index.hpp>
 #include <controller/status_bar.hpp>
 #include <controller/summary.hpp>
+#include <define.hpp>
 
 using httplib::Server;
+using std::string;
 using waka::controller::ConfigController;
 using waka::controller::HeartbeatController;
 using waka::controller::IndexController;
@@ -38,6 +40,12 @@ void setupRouting(Server& server) {
   server.Get("/api/users/current/statusbar/today",
              Wrapper<StatusBarController, Method::GET>{});
   server.Get("/api/summary", Wrapper<SummaryController, Method::GET>{});
+
+  string assets_dir = string(WAKA_PROJECT_DIR) + "/assets";
+  server.set_mount_point("/dashboard", assets_dir + "/dashboard");
+  server.set_mount_point("/css", assets_dir + "/css");
+  server.set_mount_point("/icon", assets_dir + "/icon");
+  server.set_mount_point("/js", assets_dir + "/js");
 }
 
 }  // namespace waka::http
