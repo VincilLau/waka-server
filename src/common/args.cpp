@@ -65,7 +65,6 @@ static void installWakaServer() {
   DB::setInstance(db);
   MetaService{}.init();
   db->close();
-  cout << "安装完成！" << endl;
 }
 
 static void runServer() {
