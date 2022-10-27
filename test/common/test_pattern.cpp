@@ -42,7 +42,7 @@ TEST(PatternTest, testParseUserAgent) {
   EXPECT_EQ(editor, "Unknown");
 
   ua = "wakatime/1.55.2 (linux-5.10.102.1-microsoft-standard-WSL2-x86_64) "
-       "go1.19.1 vscode/0.0.1";
+       "go1.19.1 vscode/1.0.0";
   parseUserAgent(ua, os, editor);
   EXPECT_EQ(os, "WSL");
   EXPECT_EQ(editor, "VS Code");
@@ -51,13 +51,18 @@ TEST(PatternTest, testParseUserAgent) {
        "go1.19.1 Idea/1.0.0";
   parseUserAgent(ua, os, editor);
   EXPECT_EQ(os, "WSL");
-  EXPECT_EQ(editor, "Idea");
+  EXPECT_EQ(editor, "IntelliJ IDEA");
 
   ua = "wakatime/1.55.2 (linux-5.10.102.1-microsoft-standard-WSL2-x86_64) "
        "go1.19.1 PycharmCore/1.0.0";
   parseUserAgent(ua, os, editor);
   EXPECT_EQ(os, "WSL");
   EXPECT_EQ(editor, "PyCharm");
+
+  ua = "wakatime/v1.55.2 (windows-unknown-unknown) go1.19.1 visualstudio/17.0 visualstudio-wakatime/13.0.0";
+  parseUserAgent(ua, os, editor);
+  EXPECT_EQ(os, "Windows");
+  EXPECT_EQ(editor, "Visual Studio");
 }
 
 }  // namespace waka::common

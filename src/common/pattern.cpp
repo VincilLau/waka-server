@@ -64,6 +64,8 @@ static const unordered_map<string, string> kOSMap = {
 
 static const unordered_map<string, string> kEditorMap = {
     {"vscode", "VS Code"},
+    {"visualstudio", "Visual Studio"},
+    {"Idea", "IntelliJ IDEA"},
     {"PycharmCore", "PyCharm"},
 };
 
