@@ -35,6 +35,8 @@ int main(int argc, char** argv) {
   CLI::App app{"waka-server"};
   Args args;
 
+  app.add_flag("-d, --daemon", args.daemon,
+               "以守护进程的形式运行，仅在Linux上有效");
   app.add_flag("--info", args.info, "显示配置信息");
   app.add_flag("-i, --install", args.install, "安装waka-server");
   app.add_option("--set-ip", args.ip, "设置服务器绑定的IP")

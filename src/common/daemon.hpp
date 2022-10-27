@@ -12,32 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef WAKA_SRC_COMMON_ARGS_HPP_
-#define WAKA_SRC_COMMON_ARGS_HPP_
+#ifndef WAKA_SRC_COMMON_DAEMON_HPP_
+#define WAKA_SRC_COMMON_DAEMON_HPP_
 
-#include <string>
+#include <define.hpp>
 
 namespace waka::common {
 
-struct Args {
- public:
-  // 根据命令行参数执行响应操作
-  [[nodiscard]] int exec() const;
+#if WAKA_PLATFORM == WAKA_PLATFORM_LINUX
 
- private:
-  [[nodiscard]] bool updateMetaData() const;
+#include <unistd.h>
+inline static void daemonize() { daemon(1, 0); }
 
- public:
-  bool daemon = false;
-  bool info = false;
-  std::string ip;
-  bool install = false;
-  std::string log_level;
-  int port = 0;
-  std::string time_format;
-  int timeout = 0;
-};
+#else
+inline void daemonize() {}
+#endif  // WAKA_PLATFORM == WAKA_PLATFORM_LINUX
 
 }  // namespace waka::common
 
-#endif  // WAKA_SRC_COMMON_ARGS_HPP_
+#endif  // WAKA_SRC_COMMON_DAEMON_HPP_

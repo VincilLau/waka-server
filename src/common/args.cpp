@@ -23,6 +23,7 @@
 #include <iostream>
 #include <service/meta.hpp>
 
+#include "daemon.hpp"
 #include "log.hpp"
 #include "meta_data.hpp"
 
@@ -86,62 +87,76 @@ static void printInfo() {
   print("键盘超时时间: {}分钟\n", meta_data->timeout);
 }
 
-int Args::exec() const {
-  bool exists = DB::exists(WAKA_DATA_DIR);
+bool Args::updateMetaData() const {
+  bool updated = false;
+  MetaData meta_data = *MetaData::getInstance();
 
+  if (info) {
+    updated = true;
+    printInfo();
+  }
+  if (!ip.empty()) {
+    updated = true;
+    meta_data.ip = ip;
+  }
+  if (!log_level.empty()) {
+    updated = true;
+    meta_data.log_level = log_level;
+  }
+  if (port > 0) {
+    updated = true;
+    meta_data.port = port;
+  }
+  if (!time_format.empty()) {
+    updated = true;
+    meta_data.time_format = time_format;
+  }
+  if (timeout > 0) {
+    updated = true;
+    meta_data.timeout = timeout;
+  }
+
+  if (updated) {
+    MetaService{}.writeMetaData(meta_data);
+  }
+  return updated;
+}
+
+static void checkInstall(bool install) {
+  bool exists = DB::exists(WAKA_DATA_DIR);
   if (install) {
     if (exists) {
       cerr << "检测到数据库，您可能已经完成安装！" << endl;
-      return 1;
+      exit(EXIT_FAILURE);
     }
     try {
       installWakaServer();
-      return 0;
+      exit(EXIT_SUCCESS);
     } catch (const std::exception& e) {
-      return 1;
+      cerr << e.what() << endl;
+      exit(EXIT_FAILURE);
     }
   }
 
   if (!exists) {
     cerr << "没有检测到数据库，您可能尚未进行安装！" << endl;
-    return 1;
+    exit(EXIT_FAILURE);
   }
+}
+
+int Args::exec() const {
+  checkInstall(install);
 
   init();
-  MetaData meta_data = *MetaData::getInstance();
-  bool run_server = true;
-
-  if (info) {
-    run_server = false;
-    printInfo();
-  }
-  if (!ip.empty()) {
-    run_server = false;
-    meta_data.ip = std::move(ip);
-  }
-  if (!log_level.empty()) {
-    run_server = false;
-    meta_data.log_level = std::move(log_level);
-  }
-  if (port > 0) {
-    run_server = false;
-    meta_data.port = port;
-  }
-  if (!time_format.empty()) {
-    run_server = false;
-    meta_data.time_format = std::move(time_format);
-  }
-  if (timeout > 0) {
-    run_server = false;
-    meta_data.timeout = timeout;
+  bool updated = updateMetaData();
+  if (updated) {
+    return 0;
   }
 
-  if (!run_server) {
-    MetaService{}.writeMetaData(meta_data);
-  } else {
-    runServer();
+  if (daemon) {
+    daemonize();
   }
-
+  runServer();
   return 0;
 }
 
