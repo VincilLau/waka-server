@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// 获取今天零时的Date对象
 function today() {
   let d = new Date();
   d.setHours(0);
@@ -21,27 +22,25 @@ function today() {
   return d;
 }
 
-function dateText(date) {
-  const y = date.getFullYear().toString().padStart(4, "0");
-  const m = (date.getMonth() + 1).toString().padStart(2, "0");
-  const d = date.getDate().toString().padStart(2, "0");
-  return `${y}-${m}-${d}`;
+// 获取date指定的日期的下一天零时的Date对象
+// date必须是一天的零时
+function nextDay(date) {
+  const duration = -24 * 3600 * 1000;
+  return new Date(date - duration);
 }
 
+// 获取一周前(包括今天)零时的Date对象
 function aWeekAgoFromToday() {
   const t = today();
   const d = t - 6 * 24 * 3600 * 1000;
   return new Date(d);
 }
 
-function aYearAgoFromToday() {
-  let d = today();
-  d.setFullYear(d.getFullYear() - 1);
-  d -= -24 * 3600 * 1000;
-  return new Date(d);
-}
-
-function nextDay(date) {
-  const duration = -24 * 3600 * 1000;
-  return new Date(date - duration);
+// 获取日期的YYYY-MM-DD形式
+// date必须是一天的零时
+function dateText(date) {
+  const y = date.getFullYear().toString().padStart(4, "0");
+  const m = (date.getMonth() + 1).toString().padStart(2, "0");
+  const d = date.getDate().toString().padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }

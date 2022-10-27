@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// 初始化所有<icon>元素
+// <icon>的src属性指定了svg图标的url
+// svg图标的根元素的id必须是#icon
 function initIcon() {
   $("icon")
     .addClass("sidebar-menu-icon")

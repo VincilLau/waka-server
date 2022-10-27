@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// 初始化<sidebar>元素
 function initSidebar() {
   $("sidebar").addClass("sidebar");
 }
 
+// 初始化所有<sidebar-menu>元素
 function initSidebarMenu() {
   $("sidebar-menu")
     .addClass("sidebar-menu")
+    // 实现鼠标移入时变色
     .mouseenter(function () {
       $(this).css("color", "#409eff");
       $(this).css("background-color", "#263445");

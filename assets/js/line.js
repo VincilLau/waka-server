@@ -12,10 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+class LineChartItem {
+  constructor(date, hours, timeText) {
+    this.date = date; // YYYY-MM-DD格式的日期
+    this.hours = hours; // 编码小时数，浮点数
+    this.timeText = timeText; // 时间的可视化字符串，默认为'%H小时%M分'
+  }
+}
+
+// 显示一周内编码时间的折线图
 class LineChart {
   constructor(id) {
-    this.id = id;
-    this.data = [];
+    this.id = id; // 折线图DOM的ID属性
+    this.data = []; // 折线图的数据，LineChartItem类型的数组
   }
 
   draw() {
@@ -30,16 +39,6 @@ class LineChart {
       xAxisData.push(this.data[i].date);
       seriesData.push(this.data[i].hours);
       timeTexts.push(this.data[i].timeText);
-    }
-
-    let formatter = "";
-    if (this.data.length <= 7) {
-      formatter = (item) => {
-        if (item.data == 0) {
-          return "";
-        }
-        return timeTexts[item.dataIndex];
-      };
     }
 
     const option = {
@@ -58,7 +57,12 @@ class LineChart {
           label: {
             show: true,
             position: "bottom",
-            formatter: formatter,
+            formatter: (item) => {
+              if (item.data == 0) {
+                return "";
+              }
+              return timeTexts[item.dataIndex];
+            },
             textStyle: {
               fontSize: 12,
             },

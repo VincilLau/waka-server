@@ -12,20 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+class PieChartItem {
+  constructor(name, hours, timeText) {
+    this.name = name; // 数据项的名称
+    this.hours = hours; // 编码小时数，浮点数
+    this.timeText = timeText; // 时间的可视化字符串，默认为'%H小时%M分'
+  }
+}
+
+// 饼图，显示编程语言、编辑器、操作系统和项目信息
 class PieChart {
-  constructor(id) {
-    this.id = id;
-    this.title = "";
-    this.data = [];
+  constructor(id, title) {
+    this.id = id; // 饼图DOM的ID属性
+    this.title = title; // 标题
+    this.data = []; // 饼图的数据项，PieChartItem类型的数组
   }
 
   draw() {
-    this.data.sort((item1, item2) => {
-      return item2.value - item1.value;
-    });
-
     const dom = document.getElementById(this.id);
     let chart = echarts.init(dom);
+
+    // 按hours从大到小排序
+    this.data.sort((item1, item2) => {
+      return item2.hours - item1.hours;
+    });
+
+    let data = [];
+    for (let i = 0; i < this.data.length; i++) {
+      data.push({
+        name: this.data[i].name,
+        value: this.data[i].hours,
+        timeText: this.data[i].timeText,
+      });
+    }
 
     const option = {
       title: {
@@ -35,7 +54,7 @@ class PieChart {
       tooltip: {
         trigger: "item",
         formatter: (item) => {
-          return item.data.time;
+          return item.data.timeText;
         },
       },
       legend: {
@@ -47,7 +66,7 @@ class PieChart {
           name: this.title,
           type: "pie",
           radius: "50%",
-          data: this.data,
+          data: data,
           emphasis: {
             itemStyle: {
               shadowBlur: 10,

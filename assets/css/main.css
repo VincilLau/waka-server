@@ -34,11 +34,11 @@ main {
 
 #title {
   font-size: 22px;
-  width: 90%;
-  margin-left: 5%;
-  margin-right: 5%;
+  margin-left: 4%;
+  margin-right: 4%;
   margin-top: 20px;
   margin-bottom: 20px;
+  width: 92%;
 }
 
 #title-day {

@@ -20,15 +20,8 @@ limitations under the License.
     <meta charset="utf-8" />
     <title>仪表盘</title>
     <link rel="icon" href="data:," />
-    <script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"
-    />
+    <script src="/js/echarts.min.js"></script>
+    <script src="/js/jquery.min.js"></script>
 
     <link rel="stylesheet" type="text/css" href="/css/charts.css" />
     <link rel="stylesheet" type="text/css" href="/css/icon.css" />
@@ -36,32 +29,26 @@ limitations under the License.
     <link rel="stylesheet" type="text/css" href="/css/sidebar.css" />
     <script src="/js/date.js"></script>
     <script src="/js/icon.js"></script>
-    <script src="/js/line-chart.js"></script>
-    <script src="/js/pie-chart.js"></script>
+    <script src="/js/line.js"></script>
+    <script src="/js/pie.js"></script>
     <script src="/js/sidebar.js"></script>
   </head>
   <body>
     <sidebar>
-      <sidebar-menu id="sidebar-menu-dashboard">
+      <sidebar-menu>
         <icon class="sidebar-menu-icon" src="/icon/dashboard.svg"></icon>
         仪表盘
       </sidebar-menu>
-      <!-- <sidebar-menu id="sidebar-menu-insights">
-        <icon class="sidebar-menu-icon" src="/icon/list-bullet.svg"></icon>
-        汇总</sidebar-menu
-      > -->
-      <!-- <sidebar-menu id="sidebar-menu-settings">
-        <icon class="sidebar-menu-icon" src="/icon/cog-6-tooth.svg"></icon>
-        设置</sidebar-menu
-      > -->
     </sidebar>
-    <main id="main">
+
+    <main>
       <div id="title">
         您在过去
         <span id="title-day"></span>
         内共编码
         <span id="title-time"></span>
       </div>
+
       <div id="charts"></div>
     </main>
 
