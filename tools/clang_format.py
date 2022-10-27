@@ -71,3 +71,4 @@ def format_dir(dir_path: str) -> None:
 
 if __name__ == "__main__":
     format_dir("src")
+    format_dir("test")
