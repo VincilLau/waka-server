@@ -14,6 +14,8 @@
 
 #include "pattern.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <regex>
 #include <unordered_map>
 
@@ -65,6 +67,7 @@ static const unordered_map<string, string> kEditorMap = {
 };
 
 void parseUserAgent(const string& ua, string& os, string& editor) {
+  SPDLOG_DEBUG("user_agent='{}'", ua);
   os = editor = "Unknown";
 
   regex pattern(
