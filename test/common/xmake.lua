@@ -12,11 +12,11 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-target("test_common_uuid")
+target("test_common_date")
     set_kind("binary")
     set_group("test")
 
-    add_files("test_uuid.cpp")
+    add_files("test_date.cpp")
     add_includedirs("$(projectdir)/src")
 
     if is_plat("windows") then
@@ -26,13 +26,29 @@ target("test_common_uuid")
     add_deps("waka-server_static")
     add_links("waka-server_static")
 
-    add_packages("gtest", "spdlog")
+    add_packages("fmt", "gtest", "spdlog")
 
-target("test_common_date")
+target("test_common_pattern")
     set_kind("binary")
     set_group("test")
 
-    add_files("test_date.cpp")
+    add_files("test_pattern.cpp")
+    add_includedirs("$(projectdir)/src")
+
+    if is_plat("windows") then
+        add_cxxflags("/source-charset:utf-8", "/execution-charset:utf-8")
+    end
+
+    add_deps("waka-server_static")
+    add_links("waka-server_static")
+
+    add_packages("fmt", "gtest", "spdlog")
+
+target("test_common_uuid")
+    set_kind("binary")
+    set_group("test")
+
+    add_files("test_uuid.cpp")
     add_includedirs("$(projectdir)/src")
 
     if is_plat("windows") then
