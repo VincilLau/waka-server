@@ -24,9 +24,9 @@ namespace waka::controller {
 class ConfigController {
  public:
   // GET /api/config
-  void get(const http::Request& rep, http::Response& resp);
+  void get(const http::Request& req, http::Response& resp);
   // PUT /api/config
-  void put(const http::Request& rep, http::Response& resp);
+  void put(const http::Request& req, http::Response& resp);
 
  private:
   service::MetaService meta_service_;

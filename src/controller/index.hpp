@@ -22,7 +22,7 @@ namespace waka::controller {
 class IndexController {
  public:
   // GET /
-  void get(const http::Request& rep, http::Response& resp) {
+  void get(const http::Request& req, http::Response& resp) {
     resp.setRedirect("/dashboard");
   }
 };
