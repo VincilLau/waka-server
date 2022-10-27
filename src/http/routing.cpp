@@ -41,11 +41,10 @@ void setupRouting(Server& server) {
              Wrapper<StatusBarController, Method::kGet>{});
   server.Get("/api/summary", Wrapper<SummaryController, Method::kGet>{});
 
-  string assets_dir = string(WAKA_PROJECT_DIR) + "/assets";
-  server.set_mount_point("/dashboard", assets_dir + "/dashboard");
-  server.set_mount_point("/css", assets_dir + "/css");
-  server.set_mount_point("/icon", assets_dir + "/icon");
-  server.set_mount_point("/js", assets_dir + "/js");
+  server.set_mount_point("/dashboard", "./assets/dashboard");
+  server.set_mount_point("/css", "./assets/css");
+  server.set_mount_point("/icon", "./assets/icon");
+  server.set_mount_point("/js", "./assets/js");
 }
 
 }  // namespace waka::http

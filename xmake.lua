@@ -30,6 +30,8 @@ add_requires(
 
 target("waka-server")
     set_kind("binary")
+    set_targetdir("$(projectdir)")
+
     add_files("src/main.cpp")
     add_includedirs("src")
 

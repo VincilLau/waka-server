@@ -12,8 +12,8 @@ xmake build waka-server
 ## 安装和运行
 
 ```bash
-xmake run waka-server -i
-xmake run waka-server
+./waka-server -i # 安装
+./waka-server    # 运行
 ```
 
 访问[http://127.0.0.1:8080](http://127.0.0.1:8080)查看waka-server是否正常工作。

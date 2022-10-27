@@ -4,4 +4,8 @@
 .xmake/
 build
 compile_commands.json
+dist/
 src/define.hpp
+waka-data/
+waka-server
+waka-server.exe
