@@ -14,11 +14,13 @@
 
 #include "date.hpp"
 
+#include <array>
 #include <cassert>
 #include <exception/date_error.hpp>
 #include <regex>
 
 using fmt::format;
+using std::array;
 using std::int64_t;
 using std::memset;
 using std::regex;
@@ -31,66 +33,75 @@ using waka::exception::DateError;
 namespace waka::common {
 
 bool Date::operator<(const Date& other) const {
+  assert(valid() && other.valid());
+
   if (year_ < other.year_) {
     return true;
-  } else if (year_ > other.year_) {
+  }
+  if (year_ > other.year_) {
     return false;
   }
-
   if (month_ < other.month_) {
     return true;
-  } else if (month_ > other.month_) {
+  }
+  if (month_ > other.month_) {
     return false;
   }
-
   return day_ < other.day_;
 }
 
 bool Date::operator>(const Date& other) const {
+  assert(valid() && other.valid());
+
   if (year_ > other.year_) {
     return true;
-  } else if (year_ < other.year_) {
+  }
+  if (year_ < other.year_) {
     return false;
   }
-
   if (month_ > other.month_) {
     return true;
-  } else if (month_ < other.month_) {
+  }
+  if (month_ < other.month_) {
     return false;
   }
-
   return day_ > other.day_;
 }
 
 bool Date::operator<=(const Date& other) const {
+  assert(valid() && other.valid());
+
   if (year_ < other.year_) {
     return true;
-  } else if (year_ > other.year_) {
+  }
+  if (year_ > other.year_) {
     return false;
   }
-
   if (month_ < other.month_) {
     return true;
-  } else if (month_ > other.month_) {
+  }
+  if (month_ > other.month_) {
     return false;
   }
-
   return day_ <= other.day_;
 }
 
 bool Date::operator>=(const Date& other) const {
+  assert(valid() && other.valid());
+
   if (year_ > other.year_) {
     return true;
-  } else if (year_ < other.year_) {
+  }
+  if (year_ < other.year_) {
     return false;
   }
 
   if (month_ > other.month_) {
     return true;
-  } else if (month_ < other.month_) {
+  }
+  if (month_ < other.month_) {
     return false;
   }
-
   return day_ >= other.day_;
 }
 
@@ -107,27 +118,27 @@ bool Date::leapYear() const {
   return true;
 }
 
+static const array<int, Date::kMaxMonth> kMonthDays = {31, 28, 31, 30, 31, 30,
+                                                       31, 31, 30, 31, 30, 31};
+
 int Date::getMonthDay() const {
   assert(year_ >= 2000 && year_ <= 2099);
   assert(month_ >= 1 && month_ <= 12);
 
-  int month_days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-  month_days[1] += leapYear();
+  array<int, Date::kMaxMonth> month_days = kMonthDays;
+  month_days[1] += leapYear() ? 1 : 0;
   return month_days[month_ - 1];
 }
 
 bool Date::valid() const {
-  if (year_ < 2000 || year_ > 2099) {
+  if (year_ < kMinYear || year_ > kMaxYear) {
     return false;
   }
-  if (month_ < 1 || month_ > 12) {
+  if (month_ < kMinMonth || month_ > kMaxMonth) {
     return false;
   }
   int month_day = getMonthDay();
-  if (day_ < 1 || day_ > month_day) {
-    return false;
-  }
-  return true;
+  return !(day_ < 1 || day_ > month_day);
 }
 
 void Date::validate() {
@@ -147,8 +158,8 @@ void Date::validate() {
 
   assert(day_ == month_day + 1);
   month_++;
-  year_ += month_ / 12;
-  month_ %= 12;
+  year_ += month_ / kMaxMonth;
+  month_ %= kMaxMonth;
   day_ = 1;
 
   if (!valid()) {
@@ -192,7 +203,7 @@ Date Date::today() {
 }
 
 Date Date::parse(const string& date_str) {
-  regex pattern{"^(\\d{4})-(\\d{2})-(\\d{2})$"};
+  regex pattern{R"(^(\d{4})-(\d{2})-(\d{2})$)"};
   smatch matches;
   if (!regex_match(date_str, matches, pattern)) {
     throw DateError(format("parse date '{}' failed", date_str));

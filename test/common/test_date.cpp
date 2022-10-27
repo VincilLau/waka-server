@@ -181,6 +181,22 @@ TEST(DateTest, testParse) {
   EXPECT_THROW(date = Date::parse("hello world"), DateError);
 }
 
+TEST(DateTest, testUnixMilli) {
+  Date date{2022, 10, 27};
+  EXPECT_EQ(date.unixMilli(), 1666800000000LL);
+}
+
+TEST(DateTest, testFromUnixMilli) {
+  Date date = Date::fromUnixMilli(1666800000000LL);
+  Date want{2022, 10, 27};
+  EXPECT_EQ(date, want);
+}
+
+TEST(Date, testValid) {
+  Date date{2022, 10, 27};
+  EXPECT_TRUE(date.valid());
+}
+
 }  // namespace waka::common
 
 int main(int argc, char** argv) {
