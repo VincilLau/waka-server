@@ -64,40 +64,44 @@ static const unordered_map<string, string> kOSMap = {
 
 static const unordered_map<string, string> kEditorMap = {
     {"vscode", "VS Code"},
+    {"PycharmCore", "PyCharm"},
 };
 
 void parseUserAgent(const string& ua, string& os, string& editor) {
   SPDLOG_DEBUG("user_agent='{}'", ua);
-  os = editor = "Unknown";
 
-  regex pattern(
-      "^wakatime/.+? "
-      "\\((.+?)-.+\\) "
-      ".+? "
-      "(.+?)/.+?");
+  const char* pattern = R"(^wakatime/.+? \((.+?)-(.+)\) .+? (.+?)/.+)";
+  regex re(pattern);
   smatch matches;
-  if (regex_match(ua, matches, pattern)) {
-    assert(matches.size() == 3);
-    os = matches[1];
-    editor = matches[2];
+  if (!regex_match(ua, matches, re)) {
+    os = editor = "Unknown";
+    return;
+  }
+
+  assert(matches.size() == 4);
+  os = matches[1];
+  string os_version = matches[2];
+  editor = matches[3];
+
+  auto editor_iter = kEditorMap.find(editor);
+  if (editor_iter != kEditorMap.end()) {
+    editor = editor_iter->second;
   }
 
   auto os_iter = kOSMap.find(os);
   if (os_iter != kOSMap.end()) {
     os = os_iter->second;
   }
-
-  auto editor_iter = kEditorMap.find(editor);
-  if (editor_iter != kEditorMap.end()) {
-    editor = editor_iter->second;
+  if (os == "Linux" && os_version.find("WSL") != string::npos) {
+    os = "WSL";
   }
 }
 
-std::string formatTime(std::int64_t msec) {
+string formatTime(int64_t msec) {
   assert(msec >= 0);
 
-  int hours = msec / 1000 / 3600;
-  int mins = msec / 1000 / 60 % 60;
+  int64_t hours = msec / 1000LL / 3600LL;
+  int64_t mins = msec / 1000LL / 60LL % 60LL;
 
   auto meta_data = MetaData::getInstance();
   string text = regex_replace(meta_data->time_format, regex{"(%HH)"},
