@@ -16,10 +16,8 @@
 #define WAKA_SRC_COMMON_META_DATA_HPP_
 
 #include <cassert>
-#include <cstdint>
 #include <define.hpp>
 #include <memory>
-#include <string>
 
 #include "date.hpp"
 
@@ -35,6 +33,8 @@ struct MetaData {
   static constexpr int kMaxTimeout = 60;
   // 键盘超时的默认时间，单位分钟
   static constexpr int kDefaultTimeout = 3;
+  // 默认端口
+  static constexpr std::uint16_t kDefaultPort = 8080;
 
   // 获取全局元数据实例
   static std::shared_ptr<MetaData> getInstance() {
@@ -44,7 +44,7 @@ struct MetaData {
   // 设置全局元数据实例
   static void setInstance(std::shared_ptr<MetaData> meta_data) {
     assert(instance_ == nullptr);
-    instance_ = meta_data;
+    instance_ = std::move(meta_data);
   }
 
  private:
@@ -55,7 +55,7 @@ struct MetaData {
   Date create_date = Date::today();        // 数据库的创建日期
   std::string ip = "127.0.0.1";            // 服务器绑定的IP地址
   std::string log_level = "info";          // spdlog的日志等级
-  std::uint16_t port = 8080;               // 服务器绑定的端口号
+  std::uint16_t port = kDefaultPort;       // 服务器绑定的端口号
   std::string time_format = "%H小时%M分";  // 时间的可视化格式
   int timeout = kDefaultTimeout;           // 键盘输入的超时时间
   std::string version = WAKA_VERSION;      // 服务器版本
