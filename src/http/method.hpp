@@ -18,17 +18,17 @@
 namespace waka::http {
 
 enum Method {
-  GET,
-  HEAD,
-  POST,
-  PUT,
-  DELETE,
-  CONNECT,
-  OPTIONS,
-  TRACE,
-  PATCH,
+  kGet,
+  kHead,
+  kPost,
+  kPut,
+  kDelete,
+  kConnect,
+  kOptions,
+  kTrace,
+  kPatch,
 };
 
-}
+}  // namespace waka::http
 
 #endif  // WAKA_SRC_HTTP_METHOD_HPP_

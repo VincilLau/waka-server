@@ -24,11 +24,11 @@
 
 namespace waka::http {
 
-template <typename Controller, Method Method>
+template <typename Controller, Method kMethod>
 class Wrapper {};
 
 template <typename Controller>
-class Wrapper<Controller, GET> {
+class Wrapper<Controller, Method::kGet> {
  public:
   void operator()(const httplib::Request& req, httplib::Response& resp) const {
     HTTPLibRequest request{req};
@@ -45,7 +45,7 @@ class Wrapper<Controller, GET> {
 };
 
 template <typename Controller>
-class Wrapper<Controller, POST> {
+class Wrapper<Controller, Method::kPost> {
  public:
   void operator()(const httplib::Request& req, httplib::Response& resp) {
     HTTPLibRequest request{req};
@@ -62,7 +62,7 @@ class Wrapper<Controller, POST> {
 };
 
 template <typename Controller>
-class Wrapper<Controller, PUT> {
+class Wrapper<Controller, Method::kPut> {
  public:
   void operator()(const httplib::Request& req, httplib::Response& resp) {
     HTTPLibRequest request{req};

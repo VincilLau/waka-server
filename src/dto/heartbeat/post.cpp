@@ -124,6 +124,7 @@ static Heartbeat heartbeatFromJSON(const json& j, size_t index) {
 
   if (checkType(dependencies, json::value_t::array,
                 format("[{}]dependencies", index))) {
+    vector<string> deps;
     for (size_t i = 0; i < dependencies.size(); i++) {
       const auto& d = dependencies[i];
       bool ok = checkType(d, json::value_t::string,
@@ -132,8 +133,9 @@ static Heartbeat heartbeatFromJSON(const json& j, size_t index) {
         string msg = format("[{}].dependencies[{}] can't be null", index, i);
         throw JSONError(msg);
       }
+      deps.push_back(d);
     }
-    h.dependencies = make_shared<vector<string>>(dependencies);
+    h.dependencies = make_shared<vector<string>>(std::move(deps));
   }
 
   return h;
@@ -156,7 +158,9 @@ Param Param::fromJSON(const string& json_str) {
 
   for (size_t i = 0; i < j.size(); i++) {
     const auto& item = j[i];
-    checkType(item, json::value_t::object, format("[{}]", i));
+    if (!checkType(item, json::value_t::object, format("[{}]", i))) {
+      throw JSONError(format("[{}] can't be null", i));
+    }
     param.heartbeats.push_back(heartbeatFromJSON(item, i));
   }
 

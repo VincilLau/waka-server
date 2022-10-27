@@ -27,7 +27,7 @@ struct Args {
   std::string ip;
   bool install = false;
   std::string log_level;
-  std::uint16_t port = 0;
+  int port = 0;
   std::string time_format;
   int timeout = 0;
 };

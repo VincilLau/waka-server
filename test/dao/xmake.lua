@@ -21,9 +21,12 @@ target("test_dao_db")
 
     add_deps("waka-server_static", "test_main")
     add_links("waka-server_static", "test_main")
+    if is_plat("windows") then
+        add_cxxflags("/source-charset:utf-8", "/execution-charset:utf-8")
+    end
 
     add_packages(
         "fmt",
         "gtest",
-        "sqlite"
+        "sqlite3"
     )

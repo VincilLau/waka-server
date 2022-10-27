@@ -21,10 +21,10 @@
 #include <define.hpp>
 #include <filesystem>
 
-#ifdef WAKA_PLATFORM_LINUX
+#if WAKA_PLATFORM == WAKA_PLATFORM_LINUX
 // 导入isatty
 #include <unistd.h>
-#endif  // #ifdef WAKA_PLATFORM_LINUX
+#endif  // #if WAKA_PLATFORM == WAKA_PLATFORM_LINUX
 
 using std::string;
 using std::filesystem::path;
@@ -33,20 +33,20 @@ namespace waka::common {
 
 void initLogger(const string& data_dir) {
   auto log_dir = path{data_dir} / "log" / "waka.log";
-  auto logger = spdlog::daily_logger_mt("waka_logger", log_dir, 0, 0);
+  auto logger = spdlog::daily_logger_mt("waka_logger", log_dir.string(), 0, 0);
   spdlog::set_default_logger(logger);
 
   spdlog::set_level(spdlog::level::trace);
   spdlog::flush_on(spdlog::level::trace);
   spdlog::set_pattern("[%Y-%m-%d %T.%e] [%l] %t [%@] -- %v");
 
-#ifdef WAKA_PLATFORM_LINUX
+#if WAKA_PLATFORM == WAKA_PLATFORM_LINUX
   if (isatty(STDOUT_FILENO)) {
     auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     stdout_sink->set_pattern("[%Y-%m-%d %T.%e] [%^%l%$] %t [%@] -- %v");
     logger->sinks().push_back(stdout_sink);
   }
-#endif  // #ifdef WAKA_PLATFORM_LINUX
+#endif  // #if WAKA_PLATFORM == WAKA_PLATFORM_LINUX
 }
 
 const char* logLevelToStr(int level) {

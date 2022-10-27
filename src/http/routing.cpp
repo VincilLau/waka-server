@@ -32,14 +32,14 @@ using waka::controller::SummaryController;
 namespace waka::http {
 
 void setupRouting(Server& server) {
-  server.Get("/", Wrapper<IndexController, Method::GET>{});
-  server.Get("/api/config", Wrapper<ConfigController, Method::GET>{});
-  server.Put("/api/config", Wrapper<ConfigController, Method::PUT>{});
+  server.Get("/", Wrapper<IndexController, Method::kGet>{});
+  server.Get("/api/config", Wrapper<ConfigController, Method::kGet>{});
+  server.Put("/api/config", Wrapper<ConfigController, Method::kPut>{});
   server.Post("/api/users/current/heartbeats.bulk",
-              Wrapper<HeartbeatController, Method::POST>{});
+              Wrapper<HeartbeatController, Method::kPost>{});
   server.Get("/api/users/current/statusbar/today",
-             Wrapper<StatusBarController, Method::GET>{});
-  server.Get("/api/summary", Wrapper<SummaryController, Method::GET>{});
+             Wrapper<StatusBarController, Method::kGet>{});
+  server.Get("/api/summary", Wrapper<SummaryController, Method::kGet>{});
 
   string assets_dir = string(WAKA_PROJECT_DIR) + "/assets";
   server.set_mount_point("/dashboard", assets_dir + "/dashboard");

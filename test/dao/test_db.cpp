@@ -34,41 +34,41 @@ using waka::exception::DBError;
 namespace waka::dao {
 
 TEST(DBTest, testOpenDBSuccess) {
-  string data_dir =
+  path data_dir =
       path{temp_directory_path()} / "waka-server-test" / genUUIDv4();
   create_directories(data_dir);
 
   DB db;
-  db.open(data_dir);
+  db.open(data_dir.string());
 }
 
 TEST(DBTest, testOpenDBDataDirNotExists) {
-  string data_dir =
+  path data_dir =
       path{temp_directory_path()} / "waka-server-test" / genUUIDv4();
 
   DB db;
-  EXPECT_THROW(db.open(data_dir), DBError);
+  EXPECT_THROW(db.open(data_dir.string()), DBError);
 }
 
 TEST(DBTest, testOpenDBDataDirNotDir) {
-  string data_dir =
+  path data_dir =
       path{temp_directory_path()} / "waka-server-test" / genUUIDv4();
   ofstream ofs(data_dir);
   ASSERT_TRUE(ofs.is_open());
   ofs.close();
 
   DB db;
-  EXPECT_THROW(db.open(data_dir), DBError);
+  EXPECT_THROW(db.open(data_dir.string()), DBError);
 }
 
 TEST(DBTest, testOpenDBDataDirNoPerms) {
-  string data_dir =
+  path data_dir =
       path{temp_directory_path()} / "waka-server-test" / genUUIDv4();
   create_directories(data_dir);
   permissions(data_dir, perms::none, perm_options::replace);
 
   DB db;
-  EXPECT_THROW(db.open(data_dir), DBError);
+  EXPECT_THROW(db.open(data_dir.string()), DBError);
 }
 
 }  // namespace waka::dao

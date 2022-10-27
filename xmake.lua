@@ -25,7 +25,7 @@ add_requires(
     "gtest",
     "nlohmann_json",
     "spdlog",
-    "sqlite"
+    "sqlite3"
 )
 
 target("waka-server")
@@ -36,6 +36,9 @@ target("waka-server")
     add_defines("SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE")
     add_defines("SPDLOG_FMT_EXTERNAL=ON")
     add_defines("CPPHTTPLIB_THREAD_POOL_COUNT=1")
+    if is_plat("windows") then
+        add_cxxflags("/source-charset:utf-8", "/execution-charset:utf-8")
+    end
 
     add_deps("waka-server_static")
     add_links("waka-server_static")
@@ -46,7 +49,7 @@ target("waka-server")
         "fmt",
         "nlohmann_json",
         "spdlog",
-        "sqlite"
+        "sqlite3"
     )
 
 target("waka-server_static")
@@ -73,6 +76,7 @@ target("waka-server_static")
         add_defines("WAKA_PLATFORM=WAKA_PLATFORM_LINUX")
     elseif is_plat("windows") then
         add_defines("WAKA_PLATFORM=WAKA_PLATFORM_WINDOWS")
+        add_cxxflags("/source-charset:utf-8", "/execution-charset:utf-8")
     end
 
     add_packages(
@@ -80,7 +84,7 @@ target("waka-server_static")
         "fmt",
         "nlohmann_json",
         "spdlog",
-        "sqlite"
+        "sqlite3"
     )
 
 includes("test")

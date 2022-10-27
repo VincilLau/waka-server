@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
                  "设置日志级别，可以为trace,debug,info,warn,error,critical,off")
       ->check(CLI::Validator(logLevelValidator, ""));
   app.add_option("--set-port", args.port, "设置服务器监听的端口")
-      ->check(CLI::Range(1, UINT16_MAX));
+      ->check(CLI::Range(1, static_cast<int>(UINT16_MAX)));
   app.add_option("--set-time-format", args.time_format, "设置时间显示格式");
   app.add_option("--set-timeout", args.timeout, "设置键盘超时时间")
       ->check(CLI::Range(MetaData::kMinTimeout, MetaData::kMaxTimeout));

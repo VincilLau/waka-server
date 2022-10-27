@@ -19,6 +19,9 @@ target("test_main")
 
     add_defines("SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE")
     add_defines("SPDLOG_FMT_EXTERNAL=ON")
+    if is_plat("windows") then
+        add_cxxflags("/source-charset:utf-8", "/execution-charset:utf-8")
+    end
 
     add_packages(
         "fmt",
