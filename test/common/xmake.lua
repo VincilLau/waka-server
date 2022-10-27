@@ -19,13 +19,14 @@ target("test_common_uuid")
     add_files("test_uuid.cpp")
     add_includedirs("$(projectdir)/src")
 
-    add_deps("waka-server_static", "test_main")
-    add_links("waka-server_static", "test_main")
     if is_plat("windows") then
         add_cxxflags("/source-charset:utf-8", "/execution-charset:utf-8")
     end
 
-    add_packages("gtest")
+    add_deps("waka-server_static")
+    add_links("waka-server_static")
+
+    add_packages("gtest", "spdlog")
 
 target("test_common_date")
     set_kind("binary")
@@ -34,10 +35,11 @@ target("test_common_date")
     add_files("test_date.cpp")
     add_includedirs("$(projectdir)/src")
 
-    add_deps("waka-server_static", "test_main")
-    add_links("waka-server_static", "test_main")
     if is_plat("windows") then
         add_cxxflags("/source-charset:utf-8", "/execution-charset:utf-8")
     end
 
-    add_packages("fmt", "gtest")
+    add_deps("waka-server_static")
+    add_links("waka-server_static")
+
+    add_packages("fmt", "gtest", "spdlog")

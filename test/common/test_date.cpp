@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
+#include <spdlog/spdlog.h>
 
 #include <common/date.hpp>
 #include <exception/date_error.hpp>
@@ -181,3 +182,11 @@ TEST(DateTest, testParse) {
 }
 
 }  // namespace waka::common
+
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  spdlog::set_level(spdlog::level::trace);
+  spdlog::flush_on(spdlog::level::trace);
+  spdlog::set_pattern("[%Y-%m-%d %T.%e] [%l] %t [%@] -- %v");
+  return RUN_ALL_TESTS();
+}

@@ -12,21 +12,4 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-target("test_main")
-    set_kind("static")
-    set_group("test")
-    add_files("test_main.cpp")
-
-    add_defines("SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE")
-    add_defines("SPDLOG_FMT_EXTERNAL=ON")
-    if is_plat("windows") then
-        add_cxxflags("/source-charset:utf-8", "/execution-charset:utf-8")
-    end
-
-    add_packages(
-        "fmt",
-        "gtest",
-        "spdlog"
-    )
-
 includes("common", "dao")

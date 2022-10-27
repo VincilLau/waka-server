@@ -52,7 +52,7 @@ target("waka-server")
         "sqlite3"
     )
 
-target("waka-server_static")
+target("waka-server_static", "test_main")
     set_kind("static")
 
     set_configdir("$(projectdir)/src")

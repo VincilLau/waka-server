@@ -19,8 +19,9 @@ target("test_dao_db")
     add_files("test_db.cpp")
     add_includedirs("$(projectdir)/src")
 
-    add_deps("waka-server_static", "test_main")
-    add_links("waka-server_static", "test_main")
+    add_deps("waka-server_static")
+    add_links("waka-server_static")
+
     if is_plat("windows") then
         add_cxxflags("/source-charset:utf-8", "/execution-charset:utf-8")
     end
@@ -28,5 +29,6 @@ target("test_dao_db")
     add_packages(
         "fmt",
         "gtest",
+        "spdlog",
         "sqlite3"
     )

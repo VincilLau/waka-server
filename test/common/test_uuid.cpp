@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
+#include <spdlog/spdlog.h>
 
 #include <common/uuid.hpp>
 #include <regex>
@@ -35,3 +36,11 @@ TEST(UUIDTest, testGenUUIDv4) {
 }
 
 }  // namespace waka::common
+
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  spdlog::set_level(spdlog::level::trace);
+  spdlog::flush_on(spdlog::level::trace);
+  spdlog::set_pattern("[%Y-%m-%d %T.%e] [%l] %t [%@] -- %v");
+  return RUN_ALL_TESTS();
+}
