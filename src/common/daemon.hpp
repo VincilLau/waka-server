@@ -25,7 +25,7 @@ namespace waka::common {
 inline static void daemonize() { daemon(1, 0); }
 
 #else
-inline void daemonize() {}
+inline static void daemonize() {}
 #endif  // WAKA_PLATFORM == WAKA_PLATFORM_LINUX
 
 }  // namespace waka::common
