@@ -13,7 +13,7 @@
 -- limitations under the License.
 
 set_project("waka-server")
-version = "0.0.0"
+version = "0.1.0"
 set_version(version)
 set_languages("c++17")
 
